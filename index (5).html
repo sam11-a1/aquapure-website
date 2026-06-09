@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AquaPure — Safe RO Water Delivery</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a2e;background:#f4f8fd;}
+    /* ── Buttons ── */
+    .btn-primary{background:#1a6fc4;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s;}
+    .btn-primary:hover{background:#155fa8;}
+    .btn-primary:disabled{background:#aaa;cursor:not-allowed;}
+    .btn-outline{background:transparent;color:#1a6fc4;border:1.5px solid #1a6fc4;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:.2s;}
+    .btn-outline:hover{background:#e6f1fb;}
+    /* ── Layout ── */
+    .section{padding:56px 24px;}
+    .container{max-width:960px;margin:0 auto;}
+    .section-title{font-size:22px;font-weight:600;color:#1a1a2e;margin-bottom:8px;text-align:center;}
+    .section-sub{font-size:15px;color:#555;text-align:center;margin-bottom:36px;}
+    .badge{display:inline-block;background:#e6f1fb;color:#0c447c;font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+    /* ── Forms ── */
+    input,select,textarea{width:100%;padding:10px 14px;border:1px solid #d0dce8;border-radius:8px;font-size:14px;background:#fff;color:#1a1a2e;margin-bottom:12px;}
+    input:focus,select:focus{outline:none;border-color:#1a6fc4;box-shadow:0 0 0 3px rgba(26,111,196,.12);}
+    label{font-size:13px;color:#555;display:block;margin-bottom:4px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+    /* ── Alert ── */
+    .alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;}
+    .alert.success{background:#eaf3de;color:#3b6d11;border:1px solid #97c459;display:block;}
+    .alert.error{background:#fde8e8;color:#c0392b;border:1px solid #e74c3c;display:block;}
+    /* ── Nav ── */
+    nav{background:#fff;border-bottom:1px solid #e8eef5;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;}
+    .nav-logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;color:#1a6fc4;}
+    .nav-links{display:flex;gap:24px;}
+    .nav-links a{font-size:14px;color:#555;text-decoration:none;cursor:pointer;}
+    .nav-links a:hover{color:#1a6fc4;}
+    @media(max-width:600px){.nav-links{display:none;}}
+    .user-menu{display:none;position:relative;}
+    .user-menu.active{display:flex;align-items:center;gap:8px;}
+    .avatar-btn{width:36px;height:36px;border-radius:50%;background:#1a6fc4;color:#fff;border:none;cursor:pointer;font-weight:700;font-size:14px;}
+    .dropdown{display:none;position:absolute;right:0;top:44px;background:#fff;border:1px solid #e8eef5;border-radius:10px;padding:8px;min-width:180px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:200;}
+    .dropdown.open{display:block;}
+    .dropdown a{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;color:#333;text-decoration:none;border-radius:6px;cursor:pointer;}
+    .dropdown a:hover{background:#f4f8fd;}
+    .dropdown hr{border:none;border-top:1px solid #e8eef5;margin:4px 0;}
+    /* ── Hero ── */
+    .hero{background:linear-gradient(135deg,#0c447c 0%,#1a6fc4 60%,#378add 100%);color:#fff;padding:72px 24px;text-align:center;}
+    .hero h1{font-size:32px;font-weight:700;margin-bottom:16px;line-height:1.3;}
+    .hero p{font-size:16px;opacity:.88;margin-bottom:32px;max-width:520px;margin-left:auto;margin-right:auto;}
+    @media(max-width:600px){.hero h1{font-size:24px;}}
+    .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .btn-white{background:#fff;color:#1a6fc4;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+    .btn-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6);padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+    .hero-stats{display:flex;gap:32px;justify-content:center;margin-top:40px;flex-wrap:wrap;}
+    .hero-stat .num{font-size:26px;font-weight:700;}
+    .hero-stat .lbl{font-size:13px;opacity:.75;margin-top:2px;}
+    /* ── Features ── */
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;}
+    .feature-card{background:#fff;border:1px solid #e8eef5;border-radius:12px;padding:24px 20px;text-align:center;}
+    .feature-icon{width:48px;height:48px;border-radius:12px;background:#e6f1fb;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+    .feature-icon i{font-size:22px;color:#1a6fc4;}
+    .feature-card h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+    .feature-card p{font-size:13px;color:#555;line-height:1.5;}
+    /* ── Plans ── */
+    .plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+    .plan-card{background:#fff;border:1px solid #e8eef5;border-radius:12px;padding:24px;}
+    .plan-card.featured{border:2px solid #1a6fc4;}
+    .plan-name{font-size:16px;font-weight:600;margin-bottom:4px;}
+    .plan-price{font-size:26px;font-weight:700;color:#1a6fc4;margin:8px 0;}
+    .plan-price span{font-size:14px;color:#555;font-weight:400;}
+    .plan-features{list-style:none;margin:16px 0 20px;}
+    .plan-features li{font-size:13px;color:#555;padding:5px 0;display:flex;align-items:center;gap:8px;}
+    .plan-features li i{color:#1a6fc4;}
+    /* ── Modal ── */
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;}
+    .modal.active{display:flex;}
+    .modal-box{background:#fff;border-radius:16px;padding:32px;max-width:460px;width:90%;max-height:90vh;overflow-y:auto;position:relative;}
+    .modal-box h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#888;line-height:1;}
+    .modal-close:hover{color:#333;}
+    /* ── Dashboard tabs ── */
+    .dashboard-section{background:#f0f5fc;padding:0;display:none;}
+    .dash-topbar{background:linear-gradient(135deg,#0c447c,#1a6fc4);padding:28px 24px 0;color:#fff;}
+    .dash-topbar-inner{max-width:960px;margin:0 auto;}
+    .dash-profile-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+    .dash-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.4);}
+    .dash-profile-info h2{font-size:20px;font-weight:700;margin-bottom:2px;}
+    .dash-profile-info p{font-size:13px;opacity:.8;}
+    .dash-close-btn{margin-left:auto;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;}
+    .dash-close-btn:hover{background:rgba(255,255,255,.25);}
+    .dash-tabs{display:flex;gap:4px;padding-top:4px;}
+    .dash-tab{padding:10px 18px;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;border-radius:8px 8px 0 0;border:none;background:transparent;transition:.15s;}
+    .dash-tab:hover{color:#fff;background:rgba(255,255,255,.1);}
+    .dash-tab.active{background:#fff;color:#1a6fc4;font-weight:600;}
+    .dash-body{max-width:960px;margin:0 auto;padding:24px;}
+    .dash-panel{display:none;}
+    .dash-panel.active{display:block;}
+    /* ── Profile panel ── */
+    .profile-card{background:#fff;border-radius:12px;border:1px solid #e8eef5;padding:24px;margin-bottom:16px;}
+    .profile-card h3{font-size:15px;font-weight:600;margin-bottom:18px;color:#1a1a2e;display:flex;align-items:center;gap:8px;}
+    .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    @media(max-width:600px){.profile-grid{grid-template-columns:1fr;}}
+    .profile-field label{font-size:11px;color:#888;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+    .profile-field .val{font-size:14px;color:#1a1a2e;font-weight:500;padding:8px 12px;background:#f4f8fd;border-radius:6px;}
+    .status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+    .pill-active{background:#eaf3de;color:#3b6d11;}
+    .pill-pending{background:#fff8e1;color:#ba7517;}
+    .pill-transit{background:#e6f1fb;color:#0c447c;}
+    .pill-delivered{background:#eaf3de;color:#3b6d11;}
+    .pill-paid{background:#eaf3de;color:#3b6d11;}
+    .pill-unpaid{background:#fde8e8;color:#c0392b;}
+    /* ── Stats row ── */
+    .dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+    .dash-stat{background:#fff;border-radius:12px;padding:16px;border:1px solid #e8eef5;text-align:center;}
+    .dash-stat .ds-num{font-size:24px;font-weight:700;color:#1a6fc4;}
+    .dash-stat .ds-lbl{font-size:11px;color:#666;margin-top:4px;}
+    /* ── Order card ── */
+    .order-card{background:#fff;border:1px solid #e8eef5;border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+    .order-card-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
+    .order-plan{font-size:14px;font-weight:600;}
+    .order-meta{font-size:12px;color:#777;margin-top:3px;}
+    .order-card-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f5fc;}
+    .order-bill{font-size:15px;font-weight:700;color:#1a1a2e;}
+    .wa-pay-btn{background:#25d366;color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;text-decoration:none;}
+    /* ── Place order ── */
+    .dash-card{background:#fff;border:1px solid #e8eef5;border-radius:12px;padding:20px;margin-bottom:16px;}
+    .dash-card h3{font-size:15px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .bottle-selector{display:flex;align-items:center;border:1.5px solid #1a6fc4;border-radius:10px;overflow:hidden;width:fit-content;}
+    .bottle-btn{width:40px;height:40px;background:#e6f1fb;border:none;font-size:20px;cursor:pointer;color:#1a6fc4;font-weight:700;display:flex;align-items:center;justify-content:center;transition:.15s;}
+    .bottle-btn:hover{background:#1a6fc4;color:#fff;}
+    .bottle-count{width:52px;text-align:center;font-size:18px;font-weight:700;color:#1a1a2e;border:none;outline:none;background:#fff;}
+    .bill-summary{background:#f4f8fd;border-radius:10px;padding:14px 16px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+    .bill-line{font-size:13px;color:#555;}
+    .bill-total{font-size:18px;font-weight:700;color:#1a6fc4;}
+    .place-order-btn{background:#1a6fc4;color:#fff;border:none;border-radius:8px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:12px;transition:background .2s;}
+    .place-order-btn:hover{background:#155fa8;}
+    .place-order-btn:disabled{background:#aaa;cursor:not-allowed;}
+    /* ── Payment ── */
+    .payment-section{background:#fff;border:1px solid #e8eef5;border-radius:12px;padding:24px;text-align:center;}
+    .qr-placeholder{width:160px;height:160px;background:#e6f1fb;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:16px auto;border:2px dashed #1a6fc4;}
+    .steps-list{text-align:left;margin:16px 0;}
+    .step-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+    .step-num{width:24px;height:24px;background:#1a6fc4;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+    /* ── Tracking ── */
+    .tracking-card{background:#fff;border:1px solid #e8eef5;border-radius:12px;padding:20px;margin-bottom:12px;}
+    /* ── FAQ ── */
+    .faq-item{background:#fff;border:1px solid #e8eef5;border-radius:10px;overflow:hidden;margin-bottom:4px;}
+    .faq-q{padding:16px 20px;font-size:14px;font-weight:500;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+    .faq-a{padding:0 20px 16px;font-size:13px;color:#555;line-height:1.7;display:none;}
+    .faq-item.open .faq-a{display:block;}
+    /* ── WhatsApp float ── */
+    .whatsapp-btn{position:fixed;bottom:24px;right:24px;background:#25d366;color:#fff;border:none;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:999;box-shadow:0 4px 12px rgba(37,211,102,.4);text-decoration:none;}
+    /* ── Footer ── */
+    footer{background:#0c447c;color:#b5d4f4;padding:40px 24px 24px;}
+    .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:32px;max-width:960px;margin:0 auto 32px;}
+    .footer-brand h3{color:#fff;font-size:16px;font-weight:700;margin-bottom:8px;}
+    .footer-col h4{color:#fff;font-size:14px;font-weight:600;margin-bottom:12px;}
+    .footer-col a{display:block;font-size:13px;color:#85b7eb;margin-bottom:8px;text-decoration:none;cursor:pointer;}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:20px;text-align:center;font-size:12px;max-width:960px;margin:0 auto;}
+    /* ── Loader spinner ── */
+    .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .empty-state{text-align:center;padding:32px;color:#999;}
+    .empty-state i{font-size:40px;display:block;margin-bottom:10px;}
+    .empty-state p{font-size:13px;}
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <div class="nav-logo"><i class="ti ti-droplet-filled"></i> AquaPure</div>
+  <div class="nav-links">
+    <a onclick="goTo('plans')">Plans</a>
+    <a onclick="goTo('track')">Track Order</a>
+    <a onclick="goTo('payment')">Payment</a>
+    <a onclick="goTo('contact')">Contact</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="authBtns" style="display:flex;gap:8px;">
+      <button class="btn-outline" style="padding:7px 16px;font-size:13px;" onclick="openModal('loginModal')">Login</button>
+      <button class="btn-primary" style="padding:7px 16px;font-size:13px;" onclick="openModal('registerModal')">Register</button>
+    </div>
+    <div class="user-menu" id="userMenu">
+      <button class="avatar-btn" id="avatarBtn" onclick="toggleDropdown()" title="Account menu">U</button>
+      <div class="dropdown" id="dropdown">
+        <a onclick="showDashTab('profile')"><i class="ti ti-user"></i> My Profile</a>
+        <a onclick="showDashTab('orders')"><i class="ti ti-history"></i> My Orders</a>
+        <a onclick="showDashTab('neworder')"><i class="ti ti-shopping-cart"></i> Place Order</a>
+        <hr>
+        <a onclick="doLogout()" style="color:#c0392b;"><i class="ti ti-logout"></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="badge" style="background:rgba(255,255,255,.18);color:#fff;">Pure water, delivered daily</div>
+  <h1>Safe RO Water<br>Delivered to Your Doorstep</h1>
+  <p>Fresh purified RO drinking water delivered every morning by 10 AM. Register now and get your first delivery tomorrow!</p>
+  <div class="hero-btns">
+    <button class="btn-white" onclick="openModal('registerModal')"><i class="ti ti-user-plus"></i> Register Now</button>
+    <button class="btn-ghost" onclick="goTo('track')"><i class="ti ti-map-pin"></i> Track Order</button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">1,500+</div><div class="lbl">Happy Customers</div></div>
+    <div class="hero-stat"><div class="num">99.8%</div><div class="lbl">On-time Delivery</div></div>
+    <div class="hero-stat"><div class="num">10 AM</div><div class="lbl">Daily Delivery</div></div>
+    <div class="hero-stat"><div class="num">RO+UV</div><div class="lbl">Purification</div></div>
+  </div>
+</div>
+
+<!-- Live banner -->
+<div style="background:#fff8e1;border-bottom:1px solid #fac775;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+  <i class="ti ti-clock" style="color:#ba7517;font-size:18px;"></i>
+  <strong style="font-size:14px;color:#633806;">Today's delivery:</strong>
+  <span style="font-size:13px;color:#854f0b;">📍 Civil Lines, Prayagraj — estimated by <strong>10:00 AM</strong></span>
+  <span style="background:#ba7517;color:#fff;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-left:auto;">Live</span>
+</div>
+
+<!-- ═══════════════ CUSTOMER DASHBOARD ═══════════════ -->
+<div class="dashboard-section" id="customerDashboard">
+
+  <!-- Top bar with profile -->
+  <div class="dash-topbar">
+    <div class="dash-topbar-inner">
+      <div class="dash-profile-row">
+        <div class="dash-avatar" id="dashAvatar">?</div>
+        <div class="dash-profile-info">
+          <h2 id="dashUserName">Loading...</h2>
+          <p id="dashUserEmail">—</p>
+        </div>
+        <button class="dash-close-btn" onclick="closeDashboard()"><i class="ti ti-x"></i> Close</button>
+      </div>
+      <div class="dash-tabs">
+        <button class="dash-tab active" id="tab-profile"   onclick="switchTab('profile')"><i class="ti ti-user" style="font-size:13px;"></i> Profile</button>
+        <button class="dash-tab"        id="tab-orders"    onclick="switchTab('orders')"><i class="ti ti-history" style="font-size:13px;"></i> Orders</button>
+        <button class="dash-tab"        id="tab-neworder"  onclick="switchTab('neworder')"><i class="ti ti-plus" style="font-size:13px;"></i> New Order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- ── PROFILE PANEL ── -->
+    <div class="dash-panel active" id="panel-profile">
+      <div class="dash-stats" id="profileStats">
+        <div class="dash-stat"><div class="ds-num" id="statBottles">—</div><div class="ds-lbl">Bottles This Month</div></div>
+        <div class="dash-stat"><div class="ds-num" id="statBill">—</div><div class="ds-lbl">Total Billed</div></div>
+        <div class="dash-stat"><div class="ds-num" id="statPaid" style="color:#3b6d11;">—</div><div class="ds-lbl">Amount Paid</div></div>
+        <div class="dash-stat"><div class="ds-num" id="statDue" style="color:#c0392b;">—</div><div class="ds-lbl">Pending Due</div></div>
+      </div>
+
+      <div class="profile-card">
+        <h3><i class="ti ti-id-badge-2" style="color:#1a6fc4;"></i> Personal Details</h3>
+        <div class="profile-grid">
+          <div class="profile-field"><label>Full Name</label><div class="val" id="pdName">—</div></div>
+          <div class="profile-field"><label>Phone</label><div class="val" id="pdPhone">—</div></div>
+          <div class="profile-field"><label>Email</label><div class="val" id="pdEmail">—</div></div>
+          <div class="profile-field"><label>Account Status</label><div class="val" id="pdStatus">—</div></div>
+          <div class="profile-field" style="grid-column:1/-1;"><label>Delivery Address</label><div class="val" id="pdAddress">—</div></div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <h3><i class="ti ti-droplet" style="color:#1a6fc4;"></i> Current Plan</h3>
+        <div class="profile-grid">
+          <div class="profile-field"><label>Plan</label><div class="val" id="pdPlan">—</div></div>
+          <div class="profile-field"><label>Member Since</label><div class="val" id="pdSince">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS PANEL ── -->
+    <div class="dash-panel" id="panel-orders">
+      <div class="dash-stats">
+        <div class="dash-stat"><div class="ds-num" id="oStatBottles">0</div><div class="ds-lbl">Total Bottles</div></div>
+        <div class="dash-stat"><div class="ds-num" id="oStatBill">₹0</div><div class="ds-lbl">Total Bill</div></div>
+        <div class="dash-stat"><div class="ds-num" id="oStatPaid" style="color:#3b6d11;">₹0</div><div class="ds-lbl">Paid</div></div>
+        <div class="dash-stat"><div class="ds-num" id="oStatDue" style="color:#c0392b;">₹0</div><div class="ds-lbl">Pending</div></div>
+      </div>
+      <div id="ordersList">
+        <div class="empty-state"><i class="ti ti-loader"></i><p>Loading orders…</p></div>
+      </div>
+    </div>
+
+    <!-- ── NEW ORDER PANEL ── -->
+    <div class="dash-panel" id="panel-neworder">
+      <div class="dash-card">
+        <h3><i class="ti ti-shopping-cart" style="color:#1a6fc4;"></i> Place New Order</h3>
+        <div id="placeOrderAlert"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label>Select Plan</label>
+            <select id="newOrderPlan" onchange="updateBillPreview()">
+              <option value="Basic - ₹399/month">Basic — 1 can/day (20L)</option>
+              <option value="Standard - ₹699/month">Standard — 2 cans/day (40L)</option>
+              <option value="Premium - ₹1,199/month">Premium — 4 cans/day (80L)</option>
+            </select>
+          </div>
+          <div>
+            <label>Time Slot</label>
+            <select id="newOrderTime">
+              <option>8:00 AM – 9:00 AM</option>
+              <option selected>9:00 AM – 10:00 AM</option>
+              <option>10:00 AM – 11:00 AM</option>
+            </select>
+          </div>
+        </div>
+        <label>Delivery Address</label>
+        <input type="text" id="newOrderAddress" placeholder="House no., Area, Prayagraj">
+        <label>Number of Bottles</label>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div class="bottle-selector">
+            <button class="bottle-btn" onclick="changeBottles(-1)">−</button>
+            <div class="bottle-count" id="bottleDisplay">1</div>
+            <button class="bottle-btn" onclick="changeBottles(1)">+</button>
+          </div>
+          <span style="font-size:13px;color:#555;">× ₹20 per bottle</span>
+        </div>
+        <div class="bill-summary">
+          <div>
+            <div class="bill-line" id="billBottleLine">1 bottle × ₹20</div>
+            <div class="bill-line" style="font-size:11px;color:#888;margin-top:2px;">Today's delivery</div>
+          </div>
+          <div class="bill-total" id="billTotalDisplay">₹20</div>
+        </div>
+        <button class="place-order-btn" id="placeOrderBtn" onclick="placeNewOrder()">
+          <i class="ti ti-truck"></i> Place Order
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /dash-body -->
+</div><!-- /customerDashboard -->
+
+<!-- ═══════════════ FEATURES ═══════════════ -->
+<div class="section" style="background:#fff;" id="features">
+  <div class="container">
+    <div class="badge">Why AquaPure</div>
+    <h2 class="section-title">Why 1,500+ families trust us</h2>
+    <p class="section-sub">Built for your convenience every single day</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon"><i class="ti ti-clock-check"></i></div><h3>On-time delivery</h3><p>Water at your door by 10 AM daily, 365 days a year</p></div>
+      <div class="feature-card"><div class="feature-icon"><i class="ti ti-shield-check"></i></div><h3>Safe RO+UV water</h3><p>7-stage purification, tested every morning</p></div>
+      <div class="feature-card"><div class="feature-icon"><i class="ti ti-headset"></i></div><h3>Fast support</h3><p>WhatsApp us — issues resolved within 2 hours</p></div>
+      <div class="feature-card"><div class="feature-icon"><i class="ti ti-map-pin"></i></div><h3>Live tracking</h3><p>Know exactly when your water arrives</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PLANS ═══════════════ -->
+<div class="section" id="plans" style="background:#f4f8fd;">
+  <div class="container">
+    <div class="badge">Pricing</div>
+    <h2 class="section-title">Simple, affordable plans</h2>
+    <p class="section-sub">No hidden charges — cancel anytime</p>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">Basic</div>
+        <div style="font-size:13px;color:#555;">Small families</div>
+        <div class="plan-price">₹399 <span>/month</span></div>
+        <ul class="plan-features">
+          <li><i class="ti ti-check"></i> 1 can (20L) daily</li>
+          <li><i class="ti ti-check"></i> Delivery by 10 AM</li>
+          <li><i class="ti ti-check"></i> WhatsApp support</li>
+          <li><i class="ti ti-check"></i> Live tracking</li>
+        </ul>
+        <button class="btn-outline" style="width:100%;" onclick="selectPlan('Basic - ₹399/month')">Choose Basic</button>
+      </div>
+      <div class="plan-card featured">
+        <span style="background:#e6f1fb;color:#0c447c;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;">Most popular</span>
+        <div class="plan-name" style="margin-top:8px;">Standard</div>
+        <div style="font-size:13px;color:#555;">Medium families</div>
+        <div class="plan-price">₹699 <span>/month</span></div>
+        <ul class="plan-features">
+          <li><i class="ti ti-check"></i> 2 cans (40L) daily</li>
+          <li><i class="ti ti-check"></i> Priority delivery slot</li>
+          <li><i class="ti ti-check"></i> WhatsApp + call support</li>
+          <li><i class="ti ti-check"></i> Live tracking + SMS</li>
+          <li><i class="ti ti-check"></i> Free can replacement</li>
+        </ul>
+        <button class="btn-primary" style="width:100%;justify-content:center;" onclick="selectPlan('Standard - ₹699/month')">Choose Standard</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Premium</div>
+        <div style="font-size:13px;color:#555;">Large families / offices</div>
+        <div class="plan-price">₹1,199 <span>/month</span></div>
+        <ul class="plan-features">
+          <li><i class="ti ti-check"></i> 4 cans (80L) daily</li>
+          <li><i class="ti ti-check"></i> Dedicated slot</li>
+          <li><i class="ti ti-check"></i> 24/7 priority support</li>
+          <li><i class="ti ti-check"></i> Full dashboard</li>
+          <li><i class="ti ti-check"></i> Monthly quality report</li>
+        </ul>
+        <button class="btn-outline" style="width:100%;" onclick="selectPlan('Premium - ₹1,199/month')">Choose Premium</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TRACKING ═══════════════ -->
+<div class="section" id="track" style="background:#fff;">
+  <div class="container">
+    <div class="badge">Track Order</div>
+    <h2 class="section-title">Track your delivery</h2>
+    <p class="section-sub">Real-time status — no need to call!</p>
+    <div id="trackingArea">
+      <div style="text-align:center;padding:32px;background:#f4f8fd;border-radius:12px;">
+        <i class="ti ti-login" style="font-size:40px;color:#1a6fc4;"></i>
+        <p style="margin-top:12px;font-size:15px;color:#555;">Please login to track your orders</p>
+        <button class="btn-primary" style="margin-top:16px;" onclick="openModal('loginModal')">Login to Track</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAYMENT ═══════════════ -->
+<div class="section" id="payment" style="background:#f4f8fd;">
+  <div class="container">
+    <div class="badge">Payment</div>
+    <h2 class="section-title">Easy & direct payment</h2>
+    <p class="section-sub">Pay directly — zero commission, 100% to owner</p>
+    <div class="payment-section" style="max-width:480px;margin:0 auto;">
+      <h3 style="font-size:16px;font-weight:600;margin-bottom:4px;">Scan & Pay Directly</h3>
+      <p style="font-size:13px;color:#555;">Money goes directly to AquaPure — no middlemen!</p>
+      <div class="qr-placeholder">
+        <div style="text-align:center;">
+          <i class="ti ti-qrcode" style="font-size:48px;color:#1a6fc4;"></i>
+          <p style="font-size:12px;color:#555;margin-top:8px;">Owner QR Code<br>will appear here</p>
+        </div>
+      </div>
+      <div style="background:#e6f1fb;border-radius:8px;padding:12px 16px;margin:12px 0;">
+        <p style="font-size:13px;color:#0c447c;font-weight:600;">UPI ID: aquapure@upi</p>
+        <p style="font-size:12px;color:#555;">Or pay on: +91 98765 43210</p>
+      </div>
+      <div class="steps-list">
+        <div class="step-item"><div class="step-num">1</div><p style="font-size:13px;color:#555;">Scan QR or use UPI ID to pay your monthly amount</p></div>
+        <div class="step-item"><div class="step-num">2</div><p style="font-size:13px;color:#555;">Take screenshot of successful payment</p></div>
+        <div class="step-item"><div class="step-num">3</div><p style="font-size:13px;color:#555;">Send screenshot on WhatsApp to confirm order</p></div>
+      </div>
+      <a id="whatsappPayBtn" href="https://wa.me/919876543210?text=Hello%20AquaPure!%20I%20have%20made%20the%20payment." target="_blank" class="btn-primary" style="width:100%;justify-content:center;text-decoration:none;">
+        <i class="ti ti-brand-whatsapp"></i> Send Payment Screenshot
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<div class="section" id="contact" style="background:#fff;">
+  <div class="container">
+    <div class="badge">Contact</div>
+    <h2 class="section-title">Get in touch</h2>
+    <p class="section-sub">We're here to help!</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;max-width:600px;margin:0 auto;">
+      <div style="background:#f4f8fd;border-radius:12px;padding:20px;text-align:center;border:1px solid #e8eef5;">
+        <i class="ti ti-phone" style="font-size:28px;color:#1a6fc4;"></i>
+        <h4 style="font-size:14px;font-weight:600;margin:8px 0 4px;">Call us</h4>
+        <p style="font-size:13px;color:#555;">+91 98765 43210</p>
+      </div>
+      <div style="background:#f4f8fd;border-radius:12px;padding:20px;text-align:center;border:1px solid #e8eef5;">
+        <i class="ti ti-brand-whatsapp" style="font-size:28px;color:#25d366;"></i>
+        <h4 style="font-size:14px;font-weight:600;margin:8px 0 4px;">WhatsApp</h4>
+        <p style="font-size:13px;color:#555;">+91 98765 43210</p>
+      </div>
+      <div style="background:#f4f8fd;border-radius:12px;padding:20px;text-align:center;border:1px solid #e8eef5;">
+        <i class="ti ti-clock" style="font-size:28px;color:#1a6fc4;"></i>
+        <h4 style="font-size:14px;font-weight:600;margin:8px 0 4px;">Support hours</h4>
+        <p style="font-size:13px;color:#555;">7 AM – 8 PM daily</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FAQ ═══════════════ -->
+<div class="section" style="background:#f4f8fd;">
+  <div class="container">
+    <div class="badge">FAQs</div>
+    <h2 class="section-title">Frequently asked questions</h2>
+    <p class="section-sub">No need to call — find answers here!</p>
+    <div style="max-width:680px;margin:0 auto;">
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What time will my water be delivered? <i class="ti ti-chevron-down"></i></div><div class="faq-a">Delivery happens between 8 AM and 11 AM. Check the tracking section for your exact estimated time.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How do I pay? <i class="ti ti-chevron-down"></i></div><div class="faq-a">Scan the QR code or use our UPI ID to pay directly. Then send the payment screenshot on WhatsApp to confirm.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Can I pause delivery? <i class="ti ti-chevron-down"></i></div><div class="faq-a">Yes! WhatsApp us 1 day in advance. You won't be charged for paused days.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Is there a lock-in period? <i class="ti ti-chevron-down"></i></div><div class="faq-a">No contract at all. Cancel anytime with 3 days notice.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><h3><i class="ti ti-droplet-filled"></i> AquaPure</h3><p>Pure RO drinking water delivered to 1,500+ homes daily across Prayagraj.</p></div>
+    <div class="footer-col"><h4>Quick links</h4><a onclick="goTo('plans')">Plans</a><a onclick="goTo('track')">Track order</a><a onclick="goTo('payment')">Payment</a></div>
+    <div class="footer-col"><h4>Support</h4><a onclick="goTo('contact')">Contact us</a><a href="https://wa.me/919876543210" target="_blank">WhatsApp</a></div>
+    <div class="footer-col"><h4>Service areas</h4><a>Civil Lines</a><a>George Town</a><a>Mumfordganj</a><a>Naini</a></div>
+  </div>
+  <div class="footer-bottom">© 2025 AquaPure Water Services, Prayagraj. All rights reserved.</div>
+</footer>
+
+<a href="https://wa.me/919876543210" target="_blank" class="whatsapp-btn"><i class="ti ti-brand-whatsapp" style="font-size:26px;"></i></a>
+
+<!-- ═══════════════ REGISTER MODAL ═══════════════ -->
+<div class="modal" id="registerModal">
+  <div class="modal-box">
+    <h2>Create Account</h2>
+    <p>Register for daily water delivery</p>
+    <div id="regAlert"></div>
+    <div class="form-row">
+      <div><label>Full Name *</label><input type="text" id="regName" placeholder="Rahul Sharma" autocomplete="name"></div>
+      <div><label>Phone *</label><input type="tel" id="regPhone" placeholder="9876543210" autocomplete="tel"></div>
+    </div>
+    <label>Email *</label><input type="email" id="regEmail" placeholder="you@email.com" autocomplete="email">
+    <label>Password * <span style="font-size:11px;color:#888;">(min 6 characters)</span></label>
+    <input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password">
+    <label>Delivery Address *</label><input type="text" id="regAddress" placeholder="House no., Area, Prayagraj">
+    <label>Select Plan *</label>
+    <select id="regPlan">
+      <option value="">Choose plan…</option>
+      <option>Basic - ₹399/month</option>
+      <option>Standard - ₹699/month</option>
+      <option>Premium - ₹1,199/month</option>
+    </select>
+    <button class="btn-primary" id="regBtn" style="width:100%;justify-content:center;" onclick="doRegister()">
+      <i class="ti ti-user-plus"></i> Create Account
+    </button>
+    <p style="text-align:center;font-size:13px;margin-top:12px;color:#555;">Already registered? <a onclick="switchModal('registerModal','loginModal')" style="color:#1a6fc4;cursor:pointer;">Login here</a></p>
+    <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+  </div>
+</div>
+
+<!-- ═══════════════ LOGIN MODAL ═══════════════ -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h2>Welcome Back!</h2>
+    <p>Login to your AquaPure account</p>
+    <div id="loginAlert"></div>
+    <label>Email</label><input type="email" id="loginEmail" placeholder="you@email.com" autocomplete="email">
+    <label>Password</label><input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
+    <button class="btn-primary" id="loginBtn" style="width:100%;justify-content:center;margin-top:4px;" onclick="doLogin()">
+      <i class="ti ti-login"></i> Login
+    </button>
+    <p style="text-align:center;font-size:13px;margin-top:10px;"><a onclick="switchModal('loginModal','forgotModal')" style="color:#1a6fc4;cursor:pointer;"><i class="ti ti-lock-open" style="font-size:12px;"></i> Forgot Password?</a></p>
+    <p style="text-align:center;font-size:13px;margin-top:8px;color:#555;">New user? <a onclick="switchModal('loginModal','registerModal')" style="color:#1a6fc4;cursor:pointer;">Register here</a></p>
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+  </div>
+</div>
+
+<!-- ═══════════════ FORGOT PASSWORD MODAL ═══════════════ -->
+<div class="modal" id="forgotModal">
+  <div class="modal-box">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="width:56px;height:56px;background:#e6f1fb;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+        <i class="ti ti-lock-open" style="font-size:26px;color:#1a6fc4;"></i>
+      </div>
+      <h2>Reset Password</h2>
+      <p>Enter your registered email — we'll send a reset link</p>
+    </div>
+    <div id="forgotAlert"></div>
+    <label>Registered Email</label>
+    <input type="email" id="forgotEmail" placeholder="you@email.com" autocomplete="email">
+    <button class="btn-primary" id="forgotBtn" style="width:100%;justify-content:center;" onclick="doSendReset()">
+      <i class="ti ti-send"></i> Send Reset Link
+    </button>
+    <p style="text-align:center;font-size:13px;margin-top:12px;color:#555;">
+      Remembered? <a onclick="switchModal('forgotModal','loginModal')" style="color:#1a6fc4;cursor:pointer;">Login here</a>
+    </p>
+    <button class="modal-close" onclick="closeModal('forgotModal')">✕</button>
+  </div>
+</div>
+
+<!-- ═══════════════ UTILITY SCRIPT (non-module, runs first) ═══════════════ -->
+<script>
+  /* All DOM helpers live here so onclick="" attributes work */
+  function openModal(id) {
+    document.getElementById(id).classList.add('active');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    // clear alerts when closing
+    ['loginAlert','regAlert','forgotAlert'].forEach(function(a){
+      var el = document.getElementById(a);
+      if(el) el.className = 'alert';
+    });
+  }
+  function switchModal(from, to) { closeModal(from); openModal(to); }
+  function toggleDropdown() { document.getElementById('dropdown').classList.toggle('open'); }
+  function showAlert(id, type, msg) {
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.className = 'alert ' + type;
+    el.textContent = msg;
+  }
+  function clearAlert(id) {
+    var el = document.getElementById(id);
+    if(el) el.className = 'alert';
+  }
+  function toggleFaq(el) {
+    var item = el.parentElement;
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
+    if(!wasOpen) item.classList.add('open');
+  }
+  function goTo(id) {
+    var el = document.getElementById(id);
+    if(el) el.scrollIntoView({ behavior:'smooth' });
+  }
+  function switchTab(name) {
+    ['profile','orders','neworder'].forEach(function(t){
+      document.getElementById('tab-'+t).classList.remove('active');
+      document.getElementById('panel-'+t).classList.remove('active');
+    });
+    document.getElementById('tab-'+name).classList.add('active');
+    document.getElementById('panel-'+name).classList.add('active');
+    if(name === 'orders') window._loadOrders && window._loadOrders();
+  }
+  function showDashTab(name) {
+    document.getElementById('dropdown').classList.remove('open');
+    var dash = document.getElementById('customerDashboard');
+    dash.style.display = 'block';
+    dash.scrollIntoView({ behavior:'smooth' });
+    switchTab(name);
+  }
+  function closeDashboard() {
+    document.getElementById('customerDashboard').style.display = 'none';
+  }
+  function changeBottles(delta) {
+    window._bottles = Math.max(1, Math.min(20, (window._bottles || 1) + delta));
+    document.getElementById('bottleDisplay').textContent = window._bottles;
+    updateBillPreview();
+  }
+  function updateBillPreview() {
+    var b = window._bottles || 1;
+    document.getElementById('billBottleLine').textContent = b + ' bottle' + (b>1?'s':'') + ' × ₹20';
+    document.getElementById('billTotalDisplay').textContent = '₹' + (b * 20);
+  }
+  function selectPlan(plan) {
+    if(!window.currentUser){ openModal('registerModal'); return; }
+    document.getElementById('newOrderPlan').value = plan;
+    showDashTab('neworder');
+  }
+
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal').forEach(function(m){
+    m.addEventListener('click', function(e){
+      if(e.target === this) this.classList.remove('active');
+    });
+  });
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e){
+    var dd = document.getElementById('dropdown');
+    var ab = document.getElementById('avatarBtn');
+    if(dd && ab && !dd.contains(e.target) && e.target !== ab){
+      dd.classList.remove('open');
+    }
+  });
+
+  // Stubs — overwritten by module below
+  window.currentUser = null;
+  window._bottles    = 1;
+  window.doLogin     = function(){ showAlert('loginAlert','error','Firebase not loaded yet. Try again.'); };
+  window.doRegister  = function(){ showAlert('regAlert','error','Firebase not loaded yet. Try again.'); };
+  window.doSendReset = function(){ showAlert('forgotAlert','error','Firebase not loaded yet. Try again.'); };
+  window.doLogout    = function(){};
+  window.placeNewOrder = function(){};
+  window._loadOrders = function(){};
+</script>
+
+<!-- ═══════════════ FIREBASE MODULE ═══════════════ -->
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+           signOut, onAuthStateChanged, sendPasswordResetEmail }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  /* ── Firebase init ── */
+  const app  = initializeApp({
+    apiKey:            "AIzaSyBwf_05vXuD7ZyYk9Inb5tCGFg9beiItIk",
+    authDomain:        "aquapure-b9aa1.firebaseapp.com",
+    projectId:         "aquapure-b9aa1",
+    storageBucket:     "aquapure-b9aa1.firebasestorage.app",
+    messagingSenderId: "669878567043",
+    appId:             "1:669878567043:web:00410b3d4c4d7f4a661bb6"
+  });
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  /* ── Cached customer profile ── */
+  let customerData = null;
+
+  /* ════════════════════════════════════
+     AUTH STATE LISTENER
+  ════════════════════════════════════ */
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      window.currentUser = user;
+      // Show user menu, hide auth buttons
+      document.getElementById('authBtns').style.display  = 'none';
+      document.getElementById('userMenu').classList.add('active');
+      document.getElementById('avatarBtn').textContent   = user.email[0].toUpperCase();
+      document.getElementById('dashAvatar').textContent  = user.email[0].toUpperCase();
+      document.getElementById('dashUserEmail').textContent = user.email;
+
+      // Fetch customer doc from Firestore
+      try {
+        const snap = await getDocs(
+          query(collection(db,'customers'), where('uid','==', user.uid))
+        );
+        if (!snap.empty) {
+          customerData = snap.docs[0].data();
+          populateProfile(customerData);
+          // Update WhatsApp pay btn
+          const msg = encodeURIComponent(
+            `Hello AquaPure! Payment screenshot.\nName: ${customerData.name}\nPhone: ${customerData.phone}\nPlan: ${customerData.plan}\nPlease confirm.`
+          );
+          document.getElementById('whatsappPayBtn').href = `https://wa.me/919876543210?text=${msg}`;
+          // Pre-fill new order address
+          document.getElementById('newOrderAddress').placeholder = customerData.address || 'Your address';
+        } else {
+          // User exists in Auth but not Firestore (edge case)
+          document.getElementById('dashUserName').textContent  = user.email;
+          document.getElementById('pdName').textContent        = user.email;
+        }
+      } catch(e) {
+        console.error('Error fetching customer:', e);
+      }
+
+      // Load tracking section
+      loadTrackingOrders(user.uid);
+
+    } else {
+      window.currentUser = null;
+      customerData = null;
+      document.getElementById('authBtns').style.display  = 'flex';
+      document.getElementById('userMenu').classList.remove('active');
+      document.getElementById('customerDashboard').style.display = 'none';
+    }
+  });
+
+  /* ── Populate profile panel with Firestore data ── */
+  function populateProfile(d) {
+    document.getElementById('dashUserName').textContent = d.name  || '—';
+    document.getElementById('dashAvatar').textContent   = (d.name || '?')[0].toUpperCase();
+    document.getElementById('pdName').textContent       = d.name    || '—';
+    document.getElementById('pdPhone').textContent      = d.phone   || '—';
+    document.getElementById('pdEmail').textContent      = d.email   || '—';
+    document.getElementById('pdAddress').textContent    = d.address || '—';
+    document.getElementById('pdPlan').textContent       = d.plan    || '—';
+    document.getElementById('pdStatus').innerHTML =
+      `<span class="status-pill ${d.status==='active' ? 'pill-active':'pill-pending'}">
+        ${d.status==='active' ? '✅ Active' : '⏳ Pending'}
+      </span>`;
+    if (d.createdAt && d.createdAt.seconds) {
+      document.getElementById('pdSince').textContent =
+        new Date(d.createdAt.seconds * 1000).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    } else {
+      document.getElementById('pdSince').textContent = '—';
+    }
+  }
+
+  /* ── Load orders for both Orders panel and Tracking section ── */
+  async function fetchOrders(uid) {
+    try {
+      const snap = await getDocs(
+        query(collection(db,'orders'), where('uid','==', uid))
+      );
+      return snap;
+    } catch(e) {
+      console.error('fetchOrders error:', e);
+      return null;
+    }
+  }
+
+  /* ── Render orders panel ── */
+  async function renderOrdersPanel(uid) {
+    const snap = await fetchOrders(uid);
+    if (!snap) {
+      document.getElementById('ordersList').innerHTML =
+        '<div class="empty-state"><i class="ti ti-wifi-off"></i><p>Could not load orders. Check your connection.</p></div>';
+      return;
+    }
+
+    let totalBottles=0, totalBill=0, paidAmt=0, pendingAmt=0, html='';
+
+    snap.forEach(doc => {
+      const o       = doc.data();
+      const bottles = Number(o.bottles) || 1;
+      const bill    = Number(o.bill)    || bottles * 20;
+      totalBottles += bottles;
+      totalBill    += bill;
+      if (o.paymentStatus === 'paid') paidAmt    += bill;
+      else                             pendingAmt += bill;
+
+      const stClass = o.status==='delivered' ? 'pill-delivered' : o.status==='transit' ? 'pill-transit' : 'pill-pending';
+      const stLabel = o.status==='delivered' ? '✅ Delivered'   : o.status==='transit' ? '🚛 In Transit' : '⏳ Pending';
+      const payClass = o.paymentStatus==='paid' ? 'pill-paid' : 'pill-unpaid';
+      const payLabel = o.paymentStatus==='paid' ? '💚 Paid'   : '🔴 Unpaid';
+
+      const waMsg = encodeURIComponent(
+        `Hello AquaPure! Payment for order.\nPlan: ${o.plan}\nBottles: ${bottles}\nBill: ₹${bill}\nPlease confirm.`
+      );
+      const waBtn = o.paymentStatus !== 'paid'
+        ? `<a class="wa-pay-btn" href="https://wa.me/919876543210?text=${waMsg}" target="_blank">
+             <i class="ti ti-brand-whatsapp"></i> Pay via WhatsApp
+           </a>`
+        : '';
+
+      html += `
+        <div class="order-card">
+          <div class="order-card-top">
+            <div>
+              <div class="order-plan">${o.plan || '—'}</div>
+              <div class="order-meta"><i class="ti ti-map-pin" style="font-size:11px;"></i> ${o.address || '—'}</div>
+              <div class="order-meta"><i class="ti ti-clock" style="font-size:11px;"></i> ${o.time || '—'}</div>
+            </div>
+            <div style="text-align:right;">
+              <span class="status-pill ${stClass}">${stLabel}</span><br>
+              <span style="font-size:12px;color:#888;margin-top:4px;display:inline-block;">
+                ${bottles} bottle${bottles>1?'s':''} × ₹20
+              </span>
+            </div>
+          </div>
+          <div class="order-card-bottom">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span class="order-bill">₹${bill}</span>
+              <span class="status-pill ${payClass}">${payLabel}</span>
+            </div>
+            ${waBtn}
+          </div>
+        </div>`;
+    });
+
+    if (snap.empty) {
+      html = `<div class="empty-state">
+        <i class="ti ti-package"></i>
+        <p>No orders yet. Place your first order!</p>
+        <button class="btn-primary" style="margin-top:12px;" onclick="showDashTab('neworder')">
+          <i class="ti ti-plus"></i> Place Order
+        </button>
+      </div>`;
+    }
+
+    // Update stats
+    document.getElementById('oStatBottles').textContent = totalBottles;
+    document.getElementById('oStatBill').textContent    = '₹' + totalBill;
+    document.getElementById('oStatPaid').textContent    = '₹' + paidAmt;
+    document.getElementById('oStatDue').textContent     = '₹' + pendingAmt;
+    // Update profile stats too
+    document.getElementById('statBottles').textContent  = totalBottles;
+    document.getElementById('statBill').textContent     = '₹' + totalBill;
+    document.getElementById('statPaid').textContent     = '₹' + paidAmt;
+    document.getElementById('statDue').textContent      = '₹' + pendingAmt;
+
+    document.getElementById('ordersList').innerHTML = html;
+  }
+
+  /* ── Load tracking section ── */
+  async function loadTrackingOrders(uid) {
+    const snap = await fetchOrders(uid);
+    const area = document.getElementById('trackingArea');
+    if (!snap || snap.empty) {
+      area.innerHTML = `<div style="text-align:center;padding:32px;background:#f4f8fd;border-radius:12px;">
+        <i class="ti ti-package" style="font-size:40px;color:#aaa;"></i>
+        <p style="margin-top:12px;font-size:15px;color:#555;">No orders yet. Place your first order!</p>
+        <button class="btn-primary" style="margin-top:16px;" onclick="showDashTab('neworder')">Place Order</button>
+      </div>`;
+      return;
+    }
+    let html = '';
+    snap.forEach(doc => {
+      const o = doc.data();
+      const stClass = o.status==='delivered' ? 'pill-delivered' : o.status==='transit' ? 'pill-transit' : 'pill-pending';
+      const stLabel = o.status==='delivered' ? '✅ Delivered'   : o.status==='transit' ? '🚛 In Transit' : '⏳ Pending';
+      html += `<div class="tracking-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <strong style="font-size:15px;">${o.plan || '—'}</strong>
+            <p style="font-size:12px;color:#555;margin-top:2px;">${o.address || '—'}</p>
+          </div>
+          <span class="status-pill ${stClass}">${stLabel}</span>
+        </div>
+        <p style="font-size:12px;color:#888;margin-top:8px;"><i class="ti ti-clock" style="font-size:11px;"></i> ${o.time || '—'}</p>
+      </div>`;
+    });
+    area.innerHTML = html;
+  }
+
+  /* ── Expose _loadOrders so switchTab can call it ── */
+  window._loadOrders = function() {
+    if (window.currentUser) renderOrdersPanel(window.currentUser.uid);
+  };
+
+  /* ════════════════════════════════════
+     LOGIN
+  ════════════════════════════════════ */
+  window.doLogin = async function() {
+    const email    = (document.getElementById('loginEmail').value    || '').trim();
+    const password = (document.getElementById('loginPassword').value || '').trim();
+    if (!email || !password) {
+      showAlert('loginAlert','error','Please enter both email and password.'); return;
+    }
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span> Logging in…';
+    clearAlert('loginAlert');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      showAlert('loginAlert','success','✅ Login successful! Redirecting…');
+      document.getElementById('loginEmail').value    = '';
+      document.getElementById('loginPassword').value = '';
+      setTimeout(() => {
+        closeModal('loginModal');
+        showDashTab('profile');
+      }, 800);
+    } catch(e) {
+      const msg = (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential')
+        ? 'Invalid email or password. Please try again.'
+        : (e.code === 'auth/too-many-requests')
+        ? 'Too many failed attempts. Try again later.'
+        : 'Login failed: ' + e.message;
+      showAlert('loginAlert','error', msg);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-login"></i> Login';
+    }
+  };
+
+  /* ════════════════════════════════════
+     REGISTER
+  ════════════════════════════════════ */
+  window.doRegister = async function() {
+    const name     = (document.getElementById('regName').value     || '').trim();
+    const phone    = (document.getElementById('regPhone').value    || '').trim();
+    const email    = (document.getElementById('regEmail').value    || '').trim();
+    const password = (document.getElementById('regPassword').value || '').trim();
+    const address  = (document.getElementById('regAddress').value  || '').trim();
+    const plan     = document.getElementById('regPlan').value;
+
+    if (!name || !phone || !email || !password || !address || !plan) {
+      showAlert('regAlert','error','Please fill in all required fields.'); return;
+    }
+    if (password.length < 6) {
+      showAlert('regAlert','error','Password must be at least 6 characters.'); return;
+    }
+    if (!/^\d{10}$/.test(phone)) {
+      showAlert('regAlert','error','Enter a valid 10-digit phone number.'); return;
+    }
+
+    const btn = document.getElementById('regBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span> Creating account…';
+    clearAlert('regAlert');
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await addDoc(collection(db,'customers'), {
+        uid: cred.user.uid, name, phone, email, address, plan,
+        status: 'active', createdAt: serverTimestamp()
+      });
+      showAlert('regAlert','success','✅ Account created! Welcome to AquaPure!');
+      // Clear form
+      ['regName','regPhone','regEmail','regPassword','regAddress'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('regPlan').value = '';
+      setTimeout(() => { closeModal('registerModal'); showDashTab('profile'); }, 1200);
+    } catch(e) {
+      const msg = e.code === 'auth/email-already-in-use'
+        ? 'This email is already registered. Please login instead.'
+        : e.code === 'auth/invalid-email'
+        ? 'Please enter a valid email address.'
+        : 'Registration failed: ' + e.message;
+      showAlert('regAlert','error', msg);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-user-plus"></i> Create Account';
+    }
+  };
+
+  /* ════════════════════════════════════
+     FORGOT PASSWORD
+  ════════════════════════════════════ */
+  window.doSendReset = async function() {
+    const email = (document.getElementById('forgotEmail').value || '').trim();
+    if (!email) { showAlert('forgotAlert','error','Please enter your email address.'); return; }
+    const btn = document.getElementById('forgotBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span> Sending…';
+    clearAlert('forgotAlert');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showAlert('forgotAlert','success','✅ Reset link sent! Check your inbox (and spam folder).');
+      document.getElementById('forgotEmail').value = '';
+    } catch(e) {
+      const msg = (e.code === 'auth/user-not-found')
+        ? 'No account found with this email.'
+        : 'Error sending reset link. Please try again.';
+      showAlert('forgotAlert','error', msg);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-send"></i> Send Reset Link';
+    }
+  };
+
+  /* ════════════════════════════════════
+     LOGOUT
+  ════════════════════════════════════ */
+  window.doLogout = async function() {
+    try {
+      await signOut(auth);
+      closeDashboard();
+    } catch(e) {
+      console.error('Logout error:', e);
+    }
+  };
+
+  /* ════════════════════════════════════
+     PLACE NEW ORDER
+  ════════════════════════════════════ */
+  window.placeNewOrder = async function() {
+    if (!window.currentUser) { openModal('loginModal'); return; }
+    const plan    = document.getElementById('newOrderPlan').value;
+    const address = (document.getElementById('newOrderAddress').value || '').trim();
+    const time    = document.getElementById('newOrderTime').value;
+    const bottles = window._bottles || 1;
+    const bill    = bottles * 20;
+
+    if (!address) {
+      showAlert('placeOrderAlert','error','Please enter a delivery address.'); return;
+    }
+
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span> Placing order…';
+    clearAlert('placeOrderAlert');
+
+    try {
+      await addDoc(collection(db,'orders'), {
+        uid:           window.currentUser.uid,
+        email:         window.currentUser.email,
+        plan, address, time, bottles, bill,
+        status:        'pending',
+        paymentStatus: 'pending',
+        createdAt:     serverTimestamp()
+      });
+      showAlert('placeOrderAlert','success',
+        `✅ Order placed! ${bottles} bottle${bottles>1?'s':''} — ₹${bill}. Pay via QR and send screenshot on WhatsApp.`
+      );
+      document.getElementById('newOrderAddress').value = '';
+      window._bottles = 1;
+      document.getElementById('bottleDisplay').textContent = 1;
+      updateBillPreview();
+      // Refresh orders list and tracking
+      renderOrdersPanel(window.currentUser.uid);
+      loadTrackingOrders(window.currentUser.uid);
+    } catch(e) {
+      showAlert('placeOrderAlert','error','Error placing order. Please try again.');
+      console.error('placeNewOrder error:', e);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-truck"></i> Place Order';
+    }
+  };
+
+</script>
+</body>
+</html>
