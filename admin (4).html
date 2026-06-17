@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AquaPure — Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f8fd; color: #1a1a2e; }
+    .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0c447c, #1a6fc4); }
+    .login-card { background: #fff; border-radius: 16px; padding: 40px; width: 90%; max-width: 380px; }
+    input, select { width: 100%; padding: 10px 14px; border: 1px solid #d0dce8; border-radius: 8px; font-size: 14px; margin-bottom: 12px; }
+    input:focus, select:focus { outline: none; border-color: #1a6fc4; }
+    label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; }
+    .btn { background: #1a6fc4; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; }
+    .btn:hover { background: #155fa8; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .btn-paid { background: #eaf3de; color: #3b6d11; }
+    .btn-wa { background: #25d366; color: #fff; text-decoration: none; }
+    .btn-transit { background: #e6f1fb; color: #0c447c; }
+    .btn-delivered { background: #eaf3de; color: #3b6d11; }
+    .btn-danger { background: #fde8e8; color: #c0392b; }
+    .dashboard { display: none; }
+    .topbar { background: #fff; border-bottom: 1px solid #e8eef5; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .topbar-logo { font-size: 18px; font-weight: 700; color: #1a6fc4; display: flex; align-items: center; gap: 8px; }
+    .sidebar { width: 220px; background: #fff; border-right: 1px solid #e8eef5; min-height: calc(100vh - 60px); padding: 16px 0; position: fixed; top: 60px; left: 0; }
+    .sidebar a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; font-size: 14px; color: #555; text-decoration: none; cursor: pointer; }
+    .sidebar a:hover, .sidebar a.active { background: #e6f1fb; color: #1a6fc4; }
+    .main { margin-left: 220px; padding: 24px; }
+    @media(max-width:768px){ .sidebar { display: none; } .main { margin-left: 0; } }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #fff; border: 1px solid #e8eef5; border-radius: 12px; padding: 20px; }
+    .stat-card .num { font-size: 26px; font-weight: 700; color: #1a6fc4; }
+    .stat-card .lbl { font-size: 12px; color: #555; margin-top: 4px; }
+    .stat-card .icon { font-size: 22px; color: #1a6fc4; margin-bottom: 8px; }
+    .stat-card.green .num, .stat-card.green .icon { color: #3b6d11; }
+    .stat-card.red .num, .stat-card.red .icon { color: #c0392b; }
+    .card { background: #fff; border: 1px solid #e8eef5; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; color: #555; font-weight: 600; padding: 8px 12px; border-bottom: 1px solid #e8eef5; text-transform: uppercase; white-space: nowrap; }
+    td { padding: 11px 12px; font-size: 13px; border-bottom: 1px solid #f4f8fd; vertical-align: middle; }
+    tr:hover td { background: #f9fbfd; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-pending { background: #fff8e1; color: #ba7517; }
+    .badge-transit { background: #e6f1fb; color: #0c447c; }
+    .badge-delivered { background: #eaf3de; color: #3b6d11; }
+    .badge-active { background: #eaf3de; color: #3b6d11; }
+    .pay-paid { background: #eaf3de; color: #3b6d11; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .pay-pending { background: #fde8e8; color: #c0392b; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; }
+    .alert-success { background: #eaf3de; color: #3b6d11; }
+    .alert-error { background: #fde8e8; color: #c0392b; }
+    .overflow-x { overflow-x: auto; }
+    .search-bar { width: 100%; padding: 9px 14px; border: 1px solid #d0dce8; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
+
+    /* Customer Card */
+    .cust-card { background: #fff; border: 1px solid #e8eef5; border-radius: 14px; margin-bottom: 20px; overflow: hidden; }
+    .cust-header { background: linear-gradient(135deg, #0c447c, #1a6fc4); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+    .cust-name { font-size: 16px; font-weight: 700; }
+    .cust-meta { font-size: 12px; opacity: 0.85; margin-top: 3px; }
+    .cust-body { padding: 16px 20px; }
+    .cust-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    @media(max-width:600px){ .cust-stats { grid-template-columns: repeat(2, 1fr); } }
+    .cust-stat { border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #e8eef5; }
+    .cust-stat .csn { font-size: 18px; font-weight: 700; color: #1a6fc4; }
+    .cust-stat .csl { font-size: 11px; color: #666; margin-top: 3px; }
+    .cust-stat.green { background: #eaf3de; border-color: #c3e6a0; }
+    .cust-stat.green .csn { color: #3b6d11; }
+    .cust-stat.red { background: #fde8e8; border-color: #f5b7b1; }
+    .cust-stat.red .csn { color: #c0392b; }
+
+    /* Payment input modal */
+    .pay-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .pay-modal.open { display: flex; }
+    .pay-modal-box { background: #fff; border-radius: 16px; padding: 28px; max-width: 380px; width: 90%; }
+    .pay-modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .pay-modal-box p { font-size: 13px; color: #555; margin-bottom: 20px; }
+    .pay-input { font-size: 24px; font-weight: 700; color: #1a6fc4; border: 2px solid #1a6fc4; border-radius: 10px; padding: 12px 16px; text-align: center; }
+    .pay-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(26,111,196,0.15); }
+
+    /* Payment history */
+    .pay-history { background: #f9fbfd; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+    .pay-history-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #1a1a2e; }
+    .pay-history-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #e8eef5; font-size: 12px; }
+    .pay-history-row:last-child { border-bottom: none; }
+
+    /* Day group */
+    .day-group { margin-bottom: 20px; }
+    .day-label { font-size: 13px; font-weight: 700; color: #1a6fc4; background: #e6f1fb; padding: 6px 14px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
+
+    /* Collection highlight */
+    .collection-highlight { background: linear-gradient(135deg, #0c447c, #1a6fc4); color: #fff; border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .ch-left h2 { font-size: 28px; font-weight: 800; }
+    .ch-left p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+    .ch-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .ch-stat .csn { font-size: 20px; font-weight: 700; }
+    .ch-stat .csl { font-size: 11px; opacity: 0.75; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:20px;">
+      <i class="ti ti-droplet-filled" style="font-size:40px;color:#1a6fc4;"></i>
+      <h2 style="margin-top:8px;font-size:22px;font-weight:700;">AquaPure Admin</h2>
+      <p style="font-size:13px;color:#555;">Login to owner dashboard</p>
+    </div>
+    <div id="loginAlert"></div>
+    <label>Admin Email</label>
+    <input type="email" id="adminEmail" placeholder="admin@aquapure.in">
+    <label>Password</label>
+    <input type="password" id="adminPassword" placeholder="Your password">
+    <button class="btn" onclick="adminLogin()"><i class="ti ti-login"></i> Login</button>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="pay-modal" id="payModal">
+  <div class="pay-modal-box">
+    <h3>💰 Record Payment</h3>
+    <p id="payModalDesc">Enter amount received from customer</p>
+    <label>Amount Received (₹)</label>
+    <input type="number" class="pay-input" id="payAmount" placeholder="0" min="1">
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn" onclick="confirmPayment()" style="flex:1;">✅ Confirm Payment</button>
+      <button onclick="closePayModal()" style="flex:1;background:#f4f8fd;color:#555;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:600;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo"><i class="ti ti-droplet-filled"></i> AquaPure Admin</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+
+      <span style="font-size:13px;color:#555;" id="adminName">Admin</span>
+      <button onclick="adminLogout()" style="background:#fde8e8;color:#c0392b;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">Logout</button>
+    </div>
+  </div>
+
+  <div style="display:flex;">
+    <div class="sidebar">
+      <a onclick="showPage('overview')" class="active" id="nav-overview"><i class="ti ti-layout-dashboard"></i> Overview</a>
+      <a onclick="showPage('billing')" id="nav-billing"><i class="ti ti-cash"></i> Billing</a>
+      <a onclick="showPage('orders')" id="nav-orders"><i class="ti ti-package"></i> All Orders</a>
+      <a onclick="showPage('dayorders')" id="nav-dayorders"><i class="ti ti-calendar"></i> Day-wise Orders</a>
+      <a onclick="showPage('customers')" id="nav-customers"><i class="ti ti-users"></i> Customers</a>
+      <a onclick="showPage('delivery')" id="nav-delivery"><i class="ti ti-truck"></i> Delivery</a>
+    </div>
+
+    <div class="main">
+
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Dashboard Overview</h2>
+        <div class="collection-highlight">
+          <div class="ch-left">
+            <h2>₹<span id="overviewTotalCollection">0</span></h2>
+            <p>Total Collection (All Time)</p>
+          </div>
+          <div class="ch-stats">
+            <div class="ch-stat"><div class="csn">₹<span id="overviewPaidCollection">0</span></div><div class="csl">Collected</div></div>
+            <div class="ch-stat"><div class="csn">₹<span id="overviewDueCollection">0</span></div><div class="csl">Pending Due</div></div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="icon"><i class="ti ti-users"></i></div><div class="num" id="totalCustomers">0</div><div class="lbl">Total Customers</div></div>
+          <div class="stat-card"><div class="icon"><i class="ti ti-package"></i></div><div class="num" id="totalOrders">0</div><div class="lbl">Total Orders</div></div>
+          <div class="stat-card"><div class="icon"><i class="ti ti-droplet"></i></div><div class="num" id="totalBottlesAll">0</div><div class="lbl">Total Bottles</div></div>
+          <div class="stat-card"><div class="icon"><i class="ti ti-clock"></i></div><div class="num" id="pendingOrders">0</div><div class="lbl">Pending</div></div>
+          <div class="stat-card green"><div class="icon"><i class="ti ti-check"></i></div><div class="num" id="deliveredOrders">0</div><div class="lbl">Delivered</div></div>
+        </div>
+        <div class="card">
+          <h3><i class="ti ti-clock" style="color:#1a6fc4;"></i> Recent Orders</h3>
+          <div class="overflow-x" id="recentOrders"><p style="color:#555;font-size:13px;">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- BILLING -->
+      <div class="page" id="page-billing">
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">Billing & Payments</h2>
+        <p style="font-size:13px;color:#555;margin-bottom:20px;">Customer wise billing — partial payments supported</p>
+        <div class="stats-grid" style="margin-bottom:20px;">
+          <div class="stat-card"><div class="icon"><i class="ti ti-droplet"></i></div><div class="num" id="billTotalBottles">0</div><div class="lbl">Total Bottles</div></div>
+          <div class="stat-card"><div class="icon"><i class="ti ti-cash"></i></div><div class="num" id="billTotalAmt">₹0</div><div class="lbl">Total Amount</div></div>
+          <div class="stat-card green"><div class="icon"><i class="ti ti-check"></i></div><div class="num" id="billPaidAmt">₹0</div><div class="lbl">Collected</div></div>
+          <div class="stat-card red"><div class="icon"><i class="ti ti-alert-circle"></i></div><div class="num" id="billDueAmt">₹0</div><div class="lbl">Pending Due</div></div>
+        </div>
+        <input class="search-bar" type="text" placeholder="🔍 Search by name, phone or email..." oninput="filterBilling(this.value)">
+        <div id="billingList"><p style="color:#555;font-size:13px;">Loading...</p></div>
+      </div>
+
+      <!-- ALL ORDERS -->
+      <div class="page" id="page-orders">
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">All Orders</h2>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <h3 style="margin:0;">Orders List</h3>
+            <select id="orderFilter" onchange="loadOrders()" style="width:auto;padding:6px 12px;font-size:13px;margin:0;">
+              <option value="all">All Orders</option>
+              <option value="pending">Pending</option>
+              <option value="transit">In Transit</option>
+              <option value="delivered">Delivered</option>
+            </select>
+          </div>
+          <div class="overflow-x" id="ordersTable"><p style="color:#555;font-size:13px;">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- DAY-WISE ORDERS -->
+      <div class="page" id="page-dayorders">
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">Day-wise Orders</h2>
+        <p style="font-size:13px;color:#555;margin-bottom:20px;">See all orders grouped by date</p>
+        <div id="dayOrdersList"><p style="color:#555;font-size:13px;">Loading...</p></div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div class="page" id="page-customers">
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">All Customers</h2>
+        <div class="card">
+          <h3>Registered Customers</h3>
+          <div class="overflow-x" id="customersTable"><p style="color:#555;font-size:13px;">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- DELIVERY -->
+      <div class="page" id="page-delivery">
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">Today's Delivery</h2>
+        <div class="card">
+          <h3>Pending Deliveries</h3>
+          <p style="font-size:13px;color:#555;margin-bottom:16px;">Mark orders as delivered</p>
+          <div class="overflow-x" id="deliveryTable"><p style="color:#555;font-size:13px;">Loading...</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, serverTimestamp, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const app  = initializeApp({
+    apiKey: "AIzaSyBwf_05vXuD7ZyYk9Inb5tCGFg9beiItIk",
+    authDomain: "aquapure-b9aa1.firebaseapp.com",
+    projectId: "aquapure-b9aa1",
+    storageBucket: "aquapure-b9aa1.firebasestorage.app",
+    messagingSenderId: "669878567043",
+    appId: "1:669878567043:web:00410b3d4c4d7f4a661bb6"
+  });
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  const ADMIN_EMAIL = "admin@aquapure.in";
+
+  /* ── In-memory cache (updated by onSnapshot) ── */
+  let _customers = [], _orders = [], _payments = [];
+  let _payTarget = null;
+  let _searchVal = '';
+
+  /* ══════════════════════════════════════
+     AUTH
+  ══════════════════════════════════════ */
+  onAuthStateChanged(auth, user => {
+    if (user && user.email === ADMIN_EMAIL) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('adminName').textContent = user.email;
+      startListeners();
+    } else if (user) { signOut(auth); }
+  });
+
+  window.adminLogin = async function() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pw    = document.getElementById('adminPassword').value;
+    if (email !== ADMIN_EMAIL) { showLoginAlert('Access denied! Admin only.'); return; }
+    try { await signInWithEmailAndPassword(auth, email, pw); }
+    catch(e) { showLoginAlert('Invalid credentials!'); }
+  };
+  window.adminLogout = async function() {
+    stopListeners();
+    await signOut(auth);
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  };
+  function showLoginAlert(msg) {
+    const el = document.getElementById('loginAlert');
+    el.className = 'alert alert-error';
+    el.textContent = msg;
+  }
+
+  /* ══════════════════════════════════════
+     REAL-TIME LISTENERS
+  ══════════════════════════════════════ */
+  let _unsubCust = null, _unsubOrd = null, _unsubPay = null;
+
+  function startListeners() {
+    // Customers
+    if (_unsubCust) _unsubCust();
+    _unsubCust = onSnapshot(collection(db,'customers'), snap => {
+      _customers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      rebuildAll();
+    });
+    // Orders — descending by createdAt
+    if (_unsubOrd) _unsubOrd();
+    _unsubOrd = onSnapshot(
+      query(collection(db,'orders'), orderBy('createdAt','desc')),
+      snap => {
+        _orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        rebuildAll();
+      }
+    );
+    // Payments
+    if (_unsubPay) _unsubPay();
+    _unsubPay = onSnapshot(collection(db,'payments'), snap => {
+      _payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      rebuildAll();
+    });
+  }
+
+  function stopListeners() {
+    [_unsubCust, _unsubOrd, _unsubPay].forEach(fn => fn && fn());
+    _unsubCust = _unsubOrd = _unsubPay = null;
+  }
+
+  function rebuildAll() {
+    renderOverview();
+    renderBillingPage();
+    renderOrdersPage();
+    renderDayOrdersPage();
+    renderCustomersPage();
+    renderDeliveryPage();
+  }
+
+  /* ── Helper: customer name lookup ── */
+  function custName(uid, fallbackEmail) {
+    return (_customers.find(c => c.uid === uid) || {}).name || fallbackEmail || '—';
+  }
+
+  /* ── Helper: billing data per customer ── */
+  function buildBillingMap() {
+    const map = {};
+    _orders.forEach(o => {
+      if (!map[o.uid]) map[o.uid] = { uid: o.uid, email: o.email, orders: [], totalBottles: 0, totalBill: 0, paidAmt: 0 };
+      const b = Number(o.bottles) || 1;
+      const bill = Number(o.bill) || b * 20;
+      map[o.uid].orders.push(o);
+      map[o.uid].totalBottles += b;
+      map[o.uid].totalBill   += bill;
+    });
+    _payments.forEach(p => {
+      if (map[p.uid]) map[p.uid].paidAmt += Number(p.amount) || 0;
+    });
+    return Object.values(map).map(bd => {
+      const cust = _customers.find(c => c.uid === bd.uid) || {};
+      return { ...bd, name: cust.name || bd.email, phone: cust.phone || '-', address: cust.address || '-',
+               pendingAmt: Math.max(0, bd.totalBill - bd.paidAmt) };
+    });
+  }
+
+  /* ══════════════════════════════════════
+     OVERVIEW
+  ══════════════════════════════════════ */
+  function renderOverview() {
+    let pending = 0, delivered = 0, transit = 0, totalBottles = 0, totalBill = 0;
+    _orders.forEach(o => {
+      if (o.status === 'pending')   pending++;
+      if (o.status === 'transit')   transit++;
+      if (o.status === 'delivered') delivered++;
+      totalBottles += Number(o.bottles) || 1;
+      totalBill    += Number(o.bill) || ((Number(o.bottles)||1) * 20);
+    });
+    const totalPaid = _payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
+
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    set('totalCustomers',         _customers.length);
+    set('totalOrders',            _orders.length);
+    set('totalBottlesAll',        totalBottles);
+    set('pendingOrders',          pending);
+    set('deliveredOrders',        delivered);
+    set('overviewTotalCollection', totalBill.toLocaleString('en-IN'));
+    set('overviewPaidCollection',  totalPaid.toLocaleString('en-IN'));
+    set('overviewDueCollection',   Math.max(0, totalBill - totalPaid).toLocaleString('en-IN'));
+
+    // Recent orders table (latest 8)
+    let html = `<table><thead><tr>
+      <th>Customer</th><th>Phone</th><th>Bottles</th><th>Bill</th><th>Date</th>
+      <th>Delivery Status</th><th>Payment</th><th>Actions</th>
+    </tr></thead><tbody>`;
+    _orders.slice(0, 8).forEach(o => {
+      const b    = Number(o.bottles)||1;
+      const bill = Number(o.bill)||b*20;
+      const dt   = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      const cust = _customers.find(c=>c.uid===o.uid)||{};
+      html += `<tr>
+        <td style="font-weight:600;">${cust.name||o.email||'—'}</td>
+        <td>${cust.phone||'—'}</td>
+        <td><strong>${b}</strong></td>
+        <td style="font-weight:700;color:#1a6fc4;">₹${bill}</td>
+        <td style="font-size:12px;color:#888;">${dt}</td>
+        <td>${deliveryBadge(o.status)}</td>
+        <td>${payBadge(o.paymentStatus)}</td>
+        <td>${actionBtns(o.id, o.status, o.paymentStatus)}</td>
+      </tr>`;
+    });
+    if (_orders.length === 0) html += '<tr><td colspan="8" style="text-align:center;color:#888;padding:20px;">No orders yet</td></tr>';
+    html += '</tbody></table>';
+    const el = document.getElementById('recentOrders');
+    if(el) el.innerHTML = html;
+  }
+
+  /* ══════════════════════════════════════
+     BILLING PAGE — full real-time
+  ══════════════════════════════════════ */
+  function renderBillingPage() {
+    const billingData = buildBillingMap();
+
+    let totalBottles=0, totalBill=0, paidBill=0, dueBill=0;
+    billingData.forEach(bd => {
+      totalBottles += bd.totalBottles;
+      totalBill    += bd.totalBill;
+      paidBill     += bd.paidAmt;
+      dueBill      += bd.pendingAmt;
+    });
+    const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+    set('billTotalBottles', totalBottles);
+    set('billTotalAmt',     '₹' + totalBill.toLocaleString('en-IN'));
+    set('billPaidAmt',      '₹' + paidBill.toLocaleString('en-IN'));
+    set('billDueAmt',       '₹' + dueBill.toLocaleString('en-IN'));
+
+    const el = document.getElementById('billingList');
+    if (!el) return;
+
+    if (billingData.length === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;"><i class="ti ti-users" style="font-size:36px;display:block;margin-bottom:8px;"></i>No billing data yet.</div>';
+      return;
+    }
+
+    // Apply search filter
+    const filtered = _searchVal
+      ? billingData.filter(bd =>
+          (bd.name||'').toLowerCase().includes(_searchVal) ||
+          (bd.phone||'').includes(_searchVal) ||
+          (bd.email||'').toLowerCase().includes(_searchVal))
+      : billingData;
+
+    let html = '';
+    filtered.forEach(bd => {
+      const pct    = bd.totalBill > 0 ? Math.min(100, Math.round((bd.paidAmt/bd.totalBill)*100)) : 0;
+      const waMsg  = encodeURIComponent(`Hello ${bd.name}! AquaPure Billing:\nTotal Bottles: ${bd.totalBottles}\nTotal Bill: ₹${bd.totalBill}\nPaid: ₹${bd.paidAmt}\nPending Due: ₹${bd.pendingAmt}\nPlease pay the pending amount. Thank you!`);
+
+      // Payment history
+      const custPays = _payments.filter(p=>p.uid===bd.uid).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      let payHist = '';
+      if (custPays.length > 0) {
+        payHist = `<div class="pay-history"><div class="pay-history-title">💰 Payment History (${custPays.length} payments)</div>`;
+        custPays.forEach(p => {
+          const d = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'Unknown';
+          payHist += `<div class="pay-history-row">
+            <span>📅 ${d}</span>
+            <span style="font-weight:700;color:#3b6d11;">+₹${Number(p.amount).toLocaleString('en-IN')}</span>
+          </div>`;
+        });
+        payHist += '</div>';
+      }
+
+      // Orders table — sorted newest first
+      const sortedOrders = [...bd.orders].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+      let orderRows = '';
+      sortedOrders.forEach(o => {
+        const ob   = Number(o.bottles)||1;
+        const obill = Number(o.bill)||ob*20;
+        const dt   = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+        orderRows += `<tr>
+          <td style="font-size:12px;color:#888;">${dt}</td>
+          <td><strong>${ob}</strong> bottle${ob>1?'s':''}</td>
+          <td style="font-weight:700;color:#1a6fc4;">₹${obill}</td>
+          <td>${deliveryBadge(o.status)}</td>
+          <td>${payBadge(o.paymentStatus)}</td>
+          <td style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button class="btn-sm btn-transit"   onclick="window.updateStatus('${o.id}','transit')" title="Mark In Transit"><i class="ti ti-truck"></i> Transit</button>
+            <button class="btn-sm btn-delivered" onclick="window.updateStatus('${o.id}','delivered')" title="Mark Delivered"><i class="ti ti-check"></i> Delivered</button>
+            ${o.paymentStatus!=='paid' ? `<button class="btn-sm btn-paid" onclick="window.markOrderPaid('${o.id}')" title="Mark Paid"><i class="ti ti-cash"></i> Paid</button>` : ''}
+          </td>
+        </tr>`;
+      });
+
+      html += `<div class="cust-card">
+        <div class="cust-header">
+          <div>
+            <div class="cust-name">👤 ${bd.name}</div>
+            <div class="cust-meta"><i class="ti ti-phone" style="font-size:11px;"></i> ${bd.phone} &nbsp;|&nbsp; <i class="ti ti-mail" style="font-size:11px;"></i> ${bd.email}</div>
+            <div class="cust-meta" style="margin-top:3px;"><i class="ti ti-map-pin" style="font-size:11px;"></i> ${bd.address}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:22px;font-weight:800;">₹${bd.totalBill.toLocaleString('en-IN')}</div>
+            <div style="font-size:12px;opacity:0.8;">Total Bill</div>
+            <div style="margin-top:6px;">${bd.pendingAmt > 0
+              ? `<span style="background:rgba(231,76,60,0.2);color:#fff;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">⚠️ Due ₹${bd.pendingAmt.toLocaleString('en-IN')}</span>`
+              : `<span style="background:rgba(39,174,96,0.2);color:#fff;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">✅ Fully Paid</span>`}
+            </div>
+          </div>
+        </div>
+        <div class="cust-body">
+
+          <!-- Stats row -->
+          <div class="cust-stats">
+            <div class="cust-stat"><div class="csn">${bd.totalBottles}</div><div class="csl">🍶 Total Bottles</div></div>
+            <div class="cust-stat"><div class="csn">₹${bd.totalBill.toLocaleString('en-IN')}</div><div class="csl">💰 Total Bill</div></div>
+            <div class="cust-stat green"><div class="csn">₹${bd.paidAmt.toLocaleString('en-IN')}</div><div class="csl">✅ Paid</div></div>
+            <div class="cust-stat ${bd.pendingAmt > 0 ? 'red' : 'green'}">
+              <div class="csn">₹${bd.pendingAmt.toLocaleString('en-IN')}</div>
+              <div class="csl">${bd.pendingAmt > 0 ? '⚠️ Pending' : '✅ Cleared'}</div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#555;margin-bottom:5px;">
+              <span>Payment progress</span><span style="font-weight:600;color:#1a6fc4;">${pct}%</span>
+            </div>
+            <div style="background:#e8eef5;border-radius:20px;height:10px;overflow:hidden;">
+              <div style="background:${pct===100?'#3b6d11':'#1a6fc4'};height:100%;width:${pct}%;border-radius:20px;transition:width 0.4s;"></div>
+            </div>
+          </div>
+
+          ${payHist}
+
+          <!-- Orders breakdown -->
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#1a1a2e;">📦 Order Breakdown (${bd.orders.length} orders)</div>
+          <div class="overflow-x" style="margin-bottom:14px;">
+            <table style="background:#f9fbfd;border-radius:8px;">
+              <thead><tr><th>Date</th><th>Bottles</th><th>Bill</th><th>Delivery</th><th>Payment</th><th>Actions</th></tr></thead>
+              <tbody>${orderRows || '<tr><td colspan="6" style="text-align:center;color:#888;padding:12px;">No orders</td></tr>'}</tbody>
+            </table>
+          </div>
+
+          <!-- Action buttons -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <a class="btn-sm btn-wa" href="https://wa.me/91${bd.phone}?text=${waMsg}" target="_blank"><i class="ti ti-brand-whatsapp"></i> WhatsApp</a>
+            ${bd.pendingAmt > 0
+              ? `<button class="btn-sm btn-paid" onclick="window.openPayModal('${bd.uid}','${bd.name}',${bd.pendingAmt})"><i class="ti ti-cash"></i> Record Payment ₹${bd.pendingAmt}</button>`
+              : '<span style="font-size:12px;color:#3b6d11;font-weight:600;background:#eaf3de;padding:5px 12px;border-radius:6px;">✅ Account Settled</span>'}
+          </div>
+        </div>
+      </div>`;
+    });
+
+    el.innerHTML = html || '<div style="text-align:center;padding:32px;color:#888;">No results found.</div>';
+  }
+
+  window.filterBilling = function(val) {
+    _searchVal = val.toLowerCase().trim();
+    renderBillingPage();
+  };
+
+  /* ══════════════════════════════════════
+     ORDERS PAGE — with customer name, phone, address, date desc
+  ══════════════════════════════════════ */
+  function renderOrdersPage() {
+    const filter = document.getElementById('orderFilter')?.value || 'all';
+    let filtered = filter === 'all' ? _orders : _orders.filter(o => o.status === filter);
+
+    let html = `<table><thead><tr>
+      <th>Customer Name</th><th>Phone</th><th>Bottles</th><th>Bill</th>
+      <th>Address</th><th>Date</th><th>Delivery Status</th><th>Payment</th><th>Actions</th>
+    </tr></thead><tbody>`;
+
+    filtered.forEach(o => {
+      const b    = Number(o.bottles)||1;
+      const bill = Number(o.bill)||b*20;
+      const dt   = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      const cust = _customers.find(c=>c.uid===o.uid)||{};
+      html += `<tr>
+        <td style="font-weight:600;">${cust.name||o.email||'—'}</td>
+        <td>${cust.phone||'—'}</td>
+        <td><strong style="font-size:15px;">${b}</strong></td>
+        <td style="font-weight:700;color:#1a6fc4;">₹${bill}</td>
+        <td style="max-width:130px;font-size:12px;">${o.address||'—'}</td>
+        <td style="font-size:12px;color:#888;white-space:nowrap;">${dt}</td>
+        <td>${deliveryBadge(o.status)}</td>
+        <td>${payBadge(o.paymentStatus)}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            ${o.status !== 'transit'    ? `<button class="btn-sm btn-transit"   onclick="window.updateStatus('${o.id}','transit')"  title="Mark In Transit"><i class="ti ti-truck"></i> In Transit</button>` : ''}
+            ${o.status !== 'delivered'  ? `<button class="btn-sm btn-delivered" onclick="window.updateStatus('${o.id}','delivered')" title="Mark Delivered"><i class="ti ti-check"></i> Delivered</button>` : ''}
+            ${o.status !== 'pending'    ? `<button class="btn-sm btn-danger"    onclick="window.updateStatus('${o.id}','pending')"   title="Reset to Pending"><i class="ti ti-rotate-clockwise"></i> Reset</button>` : ''}
+            ${o.paymentStatus !== 'paid' ? `<button class="btn-sm btn-paid"     onclick="window.markOrderPaid('${o.id}')"            title="Mark Payment Done"><i class="ti ti-cash"></i> Mark Paid</button>` : '<span style="font-size:11px;color:#3b6d11;font-weight:600;">💚 Paid</span>'}
+          </div>
+        </td>
+      </tr>`;
+    });
+
+    if (filtered.length === 0) html += `<tr><td colspan="9" style="text-align:center;color:#888;padding:24px;">No orders found</td></tr>`;
+    html += '</tbody></table>';
+    const el = document.getElementById('ordersTable');
+    if(el) el.innerHTML = html;
+  }
+
+  window.loadOrders = function() { renderOrdersPage(); };
+
+  /* ══════════════════════════════════════
+     DAY-WISE ORDERS
+  ══════════════════════════════════════ */
+  function renderDayOrdersPage() {
+    const el = document.getElementById('dayOrdersList');
+    if (!el) return;
+    if (_orders.length === 0) { el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;">No orders yet.</div>'; return; }
+
+    const groups = {};
+    _orders.forEach(o => {
+      const key = o.createdAt?.toDate
+        ? o.createdAt.toDate().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+        : 'Unknown Date';
+      const sortKey = o.createdAt?.seconds || 0;
+      if (!groups[key]) groups[key] = { label: key, sortKey, orders: [] };
+      groups[key].orders.push(o);
+    });
+
+    const sorted = Object.values(groups).sort((a,b) => b.sortKey - a.sortKey);
+    let html = '';
+    sorted.forEach(g => {
+      const totB = g.orders.reduce((s,o)=>s+(Number(o.bottles)||1),0);
+      const totBill = g.orders.reduce((s,o)=>s+(Number(o.bill)||(Number(o.bottles)||1)*20),0);
+      html += `<div class="day-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <span class="day-label">📅 ${g.label}</span>
+          <span style="font-size:13px;color:#555;">${g.orders.length} orders &nbsp;|&nbsp; ${totB} bottles &nbsp;|&nbsp; <strong style="color:#1a6fc4;">₹${totBill}</strong></span>
+        </div>
+        <div class="card" style="margin-bottom:0;"><div class="overflow-x">
+          <table><thead><tr>
+            <th>Customer Name</th><th>Phone</th><th>Bottles</th><th>Bill</th><th>Address</th>
+            <th>Delivery Status</th><th>Payment</th><th>Actions</th>
+          </tr></thead><tbody>
+          ${g.orders.map(o => {
+            const b = Number(o.bottles)||1;
+            const bill = Number(o.bill)||b*20;
+            const cust = _customers.find(c=>c.uid===o.uid)||{};
+            return `<tr>
+              <td style="font-weight:600;">${cust.name||o.email||'—'}</td>
+              <td>${cust.phone||'—'}</td>
+              <td><strong>${b}</strong></td>
+              <td style="font-weight:700;color:#1a6fc4;">₹${bill}</td>
+              <td style="max-width:120px;font-size:12px;">${o.address||'—'}</td>
+              <td>${deliveryBadge(o.status)}</td>
+              <td>${payBadge(o.paymentStatus)}</td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                  ${o.status!=='transit'   ? `<button class="btn-sm btn-transit"   onclick="window.updateStatus('${o.id}','transit')"><i class="ti ti-truck"></i> In Transit</button>`:''}
+                  ${o.status!=='delivered' ? `<button class="btn-sm btn-delivered" onclick="window.updateStatus('${o.id}','delivered')"><i class="ti ti-check"></i> Delivered</button>`:''}
+                  ${o.paymentStatus!=='paid' ? `<button class="btn-sm btn-paid" onclick="window.markOrderPaid('${o.id}')"><i class="ti ti-cash"></i> Mark Paid</button>`:'<span style="font-size:11px;color:#3b6d11;font-weight:600;">💚 Paid</span>'}
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+          </tbody></table>
+        </div></div>
+      </div>`;
+    });
+    el.innerHTML = html;
+  }
+
+  /* ══════════════════════════════════════
+     CUSTOMERS PAGE
+  ══════════════════════════════════════ */
+  function renderCustomersPage() {
+    const el = document.getElementById('customersTable');
+    if (!el) return;
+    const bmap = buildBillingMap();
+    let html = `<table><thead><tr>
+      <th>Name</th><th>Phone</th><th>Email</th><th>Plan</th><th>Address</th>
+      <th>Status</th><th>Orders</th><th>Total Bill</th><th>Paid</th><th>Due</th>
+    </tr></thead><tbody>`;
+    _customers.forEach(c => {
+      const bd = bmap.find(b=>b.uid===c.uid)||{totalBottles:0,totalBill:0,paidAmt:0,pendingAmt:0};
+      const cnt = _orders.filter(o=>o.uid===c.uid).length;
+      html += `<tr>
+        <td style="font-weight:600;">${c.name||'—'}</td>
+        <td>${c.phone||'—'}</td>
+        <td style="font-size:12px;">${c.email||'—'}</td>
+        <td>${c.plan||'—'}</td>
+        <td style="max-width:110px;font-size:12px;">${c.address||'—'}</td>
+        <td><span class="badge badge-active">${c.status||'active'}</span></td>
+        <td style="font-weight:600;">${cnt}</td>
+        <td style="font-weight:700;color:#1a6fc4;">₹${bd.totalBill.toLocaleString('en-IN')}</td>
+        <td style="color:#3b6d11;font-weight:600;">₹${bd.paidAmt.toLocaleString('en-IN')}</td>
+        <td style="color:${bd.pendingAmt>0?'#c0392b':'#3b6d11'};font-weight:700;">₹${bd.pendingAmt.toLocaleString('en-IN')}</td>
+      </tr>`;
+    });
+    if (!_customers.length) html += '<tr><td colspan="10" style="text-align:center;color:#888;padding:24px;">No customers yet</td></tr>';
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  /* ══════════════════════════════════════
+     DELIVERY PAGE
+  ══════════════════════════════════════ */
+  function renderDeliveryPage() {
+    const el = document.getElementById('deliveryTable');
+    if (!el) return;
+    const pending = _orders.filter(o => o.status !== 'delivered');
+    let html = `<table><thead><tr>
+      <th>Customer Name</th><th>Phone</th><th>Bottles</th><th>Address</th><th>Time Slot</th><th>Status</th><th>Actions</th>
+    </tr></thead><tbody>`;
+    pending.forEach(o => {
+      const cust = _customers.find(c=>c.uid===o.uid)||{};
+      html += `<tr>
+        <td style="font-weight:600;">${cust.name||o.email||'—'}</td>
+        <td>${cust.phone||'—'}</td>
+        <td><strong>${Number(o.bottles)||1}</strong></td>
+        <td style="font-size:12px;">${o.address||'—'}</td>
+        <td style="font-size:12px;">${o.time||'—'}</td>
+        <td>${deliveryBadge(o.status)}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button class="btn-sm btn-transit"   onclick="window.updateStatus('${o.id}','transit')"><i class="ti ti-truck"></i> In Transit</button>
+            <button class="btn-sm btn-delivered" onclick="window.updateStatus('${o.id}','delivered')"><i class="ti ti-check"></i> Delivered</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    if (!pending.length) html += '<tr><td colspan="7" style="text-align:center;color:#3b6d11;padding:24px;font-weight:600;">🎉 All deliveries done for today!</td></tr>';
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  /* ══════════════════════════════════════
+     BADGE HELPERS
+  ══════════════════════════════════════ */
+  function deliveryBadge(status) {
+    const map = {
+      pending:   ['badge-pending',  '⏳ Pending'],
+      transit:   ['badge-transit',  '🚛 In Transit'],
+      delivered: ['badge-delivered','✅ Delivered']
+    };
+    const [cls, label] = map[status] || ['badge-pending','⏳ Pending'];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+  function payBadge(status) {
+    return status === 'paid'
+      ? '<span class="pay-paid">💚 Paid</span>'
+      : '<span class="pay-pending">🔴 Pending</span>';
+  }
+  function actionBtns(id, status, payStatus) {
+    let html = '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
+    if (status !== 'transit')   html += `<button class="btn-sm btn-transit"   onclick="window.updateStatus('${id}','transit')"><i class="ti ti-truck"></i> Transit</button>`;
+    if (status !== 'delivered') html += `<button class="btn-sm btn-delivered" onclick="window.updateStatus('${id}','delivered')"><i class="ti ti-check"></i> Done</button>`;
+    if (payStatus !== 'paid')   html += `<button class="btn-sm btn-paid"      onclick="window.markOrderPaid('${id}')">💚 Paid</button>`;
+    html += '</div>';
+    return html;
+  }
+
+  /* ══════════════════════════════════════
+     ACTIONS
+  ══════════════════════════════════════ */
+  window.updateStatus = async function(orderId, status) {
+    try { await updateDoc(doc(db,'orders',orderId), { status }); }
+    catch(e) { alert('Error updating status! Try again.'); }
+  };
+
+  window.markOrderPaid = async function(orderId) {
+    try { await updateDoc(doc(db,'orders',orderId), { paymentStatus:'paid' }); }
+    catch(e) { alert('Error! Try again.'); }
+  };
+
+  window.openPayModal = function(uid, name, pendingAmt) {
+    _payTarget = { uid, name, pendingAmt };
+    document.getElementById('payModalDesc').textContent = `Customer: ${name} | Pending: ₹${pendingAmt}`;
+    document.getElementById('payAmount').value = pendingAmt;
+    document.getElementById('payModal').classList.add('open');
+  };
+  window.closePayModal = function() {
+    document.getElementById('payModal').classList.remove('open');
+    _payTarget = null;
+  };
+  window.confirmPayment = async function() {
+    const amount = Number(document.getElementById('payAmount').value);
+    if (!amount || amount <= 0) { alert('Enter a valid amount!'); return; }
+    if (!_payTarget) return;
+    try {
+      await addDoc(collection(db,'payments'), {
+        uid: _payTarget.uid, amount,
+        createdAt: serverTimestamp(), markedBy: 'admin'
+      });
+      closePayModal();
+    } catch(e) { alert('Error recording payment! Try again.'); }
+  };
+</script>
+
+<script>
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('nav-' + page).classList.add('active');
+    if (page === 'orders') window.loadOrders();
+  }
+</script>
+</body>
+</html>
