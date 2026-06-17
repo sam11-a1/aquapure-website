@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AquaPure — Delivery Panel</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f8fd; color: #1a1a2e; }
+
+    /* LOGIN */
+    .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0c447c, #1a6fc4); padding: 24px; }
+    .login-card { background: #fff; border-radius: 16px; padding: 32px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    input { width: 100%; padding: 11px 14px; border: 1px solid #d0dce8; border-radius: 8px; font-size: 14px; margin-bottom: 12px; }
+    input:focus { outline: none; border-color: #1a6fc4; box-shadow: 0 0 0 3px rgba(26,111,196,0.12); }
+    label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; }
+    .btn-login { background: #1a6fc4; color: #fff; border: none; padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-login:hover { background: #155fa8; }
+    .alert-error { background: #fde8e8; color: #c0392b; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px; }
+
+    /* TOPBAR */
+    .topbar { background: #1a6fc4; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar h1 { color: #fff; font-size: 17px; font-weight: 700; }
+    .topbar-date { color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 2px; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .lang-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .lang-btn:hover { background: rgba(255,255,255,0.35); }
+    .logout-btn { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.4); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+    /* STATS */
+    .main { padding: 16px; max-width: 640px; margin: 0 auto; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat { background: #fff; border-radius: 12px; padding: 14px; text-align: center; border: 1px solid #e8eef5; }
+    .stat .num { font-size: 26px; font-weight: 700; color: #1a6fc4; }
+    .stat .lbl { font-size: 11px; color: #555; margin-top: 3px; }
+    .stat.green .num { color: #3b6d11; }
+    .stat.orange .num { color: #ba7517; }
+
+    /* ORDER CARD */
+    .order-card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid #e8eef5; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .order-card.delivered { border-color: #c3e6a0; background: #fafff6; }
+    .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 8px; }
+    .order-name { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .order-detail { font-size: 13px; color: #555; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+    .order-bottles { background: #e6f1fb; color: #0c447c; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .badge-pending  { background: #fff8e1; color: #ba7517; }
+    .badge-transit  { background: #e6f1fb; color: #0c447c; }
+    .badge-delivered{ background: #eaf3de; color: #3b6d11; }
+    .action-btns { display: flex; gap: 8px; margin-top: 12px; }
+    .action-btn { flex: 1; padding: 11px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-transit   { background: #e6f1fb; color: #0c447c; }
+    .btn-transit:hover { background: #cce0f5; }
+    .btn-delivered { background: #eaf3de; color: #3b6d11; }
+    .btn-delivered:hover { background: #d4edba; }
+
+    /* SECTION TITLE */
+    .sec-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px; }
+    .sec-title.pending-title  { background: #fff8e1; color: #ba7517; }
+    .sec-title.done-title     { background: #eaf3de; color: #3b6d11; }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 48px 24px; color: #888; }
+    .empty i { font-size: 52px; color: #b5d4f4; margin-bottom: 12px; display: block; }
+    .empty h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .empty p { font-size: 13px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:24px;">
+      <i class="ti ti-truck" style="font-size:44px;color:#1a6fc4;"></i>
+      <h2 style="margin-top:10px;font-size:22px;font-weight:700;">Delivery Panel</h2>
+      <p style="font-size:13px;color:#888;margin-top:4px;" id="loginSubtitle">AquaPure Delivery Team</p>
+    </div>
+    <div id="loginAlert"></div>
+    <label id="lbl-email">Email</label>
+    <input type="email" id="delEmail" placeholder="delivery@aquapure.in">
+    <label id="lbl-pass">Password</label>
+    <input type="password" id="delPassword" placeholder="Your password">
+    <button class="btn-login" onclick="deliveryLogin()">
+      <i class="ti ti-login"></i> <span id="btn-login-text">Login</span>
+    </button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-left">
+      <i class="ti ti-truck" style="color:#fff;font-size:20px;"></i>
+      <div>
+        <div class="topbar h1" style="color:#fff;font-size:16px;font-weight:700;" id="topbar-title">My Deliveries</div>
+        <div class="topbar-date" id="topbar-date"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-btn" onclick="toggleLang()" id="langToggleBtn">हिंदी</button>
+      <button class="logout-btn" onclick="deliveryLogout()" id="btn-logout">Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stats">
+      <div class="stat orange"><div class="num" id="pendingCount">0</div><div class="lbl" id="lbl-pending">Pending</div></div>
+      <div class="stat green"><div class="num" id="doneCount">0</div><div class="lbl" id="lbl-done">Delivered</div></div>
+      <div class="stat"><div class="num" id="totalCount">0</div><div class="lbl" id="lbl-total">Total</div></div>
+    </div>
+    <div id="ordersList">
+      <div class="empty"><i class="ti ti-loader" style="animation:spin 1s linear infinite;"></i><h3>Loading...</h3></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }                                    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut,
+           onAuthStateChanged, setPersistence,
+           browserLocalPersistence }                         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, doc,
+           updateDoc, onSnapshot, query, orderBy }             from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const app  = initializeApp({
+    apiKey:            "AIzaSyBwf_05vXuD7ZyYk9Inb5tCGFg9beiItIk",
+    authDomain:        "aquapure-b9aa1.firebaseapp.com",
+    projectId:         "aquapure-b9aa1",
+    storageBucket:     "aquapure-b9aa1.firebasestorage.app",
+    messagingSenderId: "669878567043",
+    appId:             "1:669878567043:web:00410b3d4c4d7f4a661bb6"
+  });
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  const ALLOWED = ["delivery@aquapure.in", "admin@aquapure.in"];
+
+  // ── Keep delivery partner logged in forever ──
+  setPersistence(auth, browserLocalPersistence).catch(()=>{});
+
+  // ── Language state ──
+  let lang = localStorage.getItem('delivLang') || 'en';
+
+  const T = {
+    en: {
+      title: 'My Deliveries', logout: 'Logout', pending: 'Pending',
+      done: 'Delivered', total: 'Total', inTransit: 'In Transit',
+      markTransit: '🚛 In Transit', markDone: '✅ Delivered',
+      pendingTitle: '⏳ Pending Deliveries', doneTitle: '✅ Completed',
+      noOrders: 'No orders today!', noOrdersSub: 'All caught up!',
+      address: 'Address', time: 'Time slot', bottles: 'Bottles',
+      loginBtn: 'Login', emailLbl: 'Email', passLbl: 'Password',
+      loginSub: 'AquaPure Delivery Team', denied: 'Access denied!',
+      invalid: 'Invalid credentials! Try again.',
+      langSwitch: 'हिंदी'
+    },
+    hi: {
+      title: 'मेरी डिलीवरी', logout: 'लॉग आउट', pending: 'बाकी',
+      done: 'हो गया', total: 'कुल', inTransit: 'रास्ते में',
+      markTransit: '🚛 रास्ते में', markDone: '✅ पहुंचा दिया',
+      pendingTitle: '⏳ बाकी डिलीवरी', doneTitle: '✅ हो गई',
+      noOrders: 'आज कोई ऑर्डर नहीं!', noOrdersSub: 'सब हो गया!',
+      address: 'पता', time: 'समय', bottles: 'बोतलें',
+      loginBtn: 'लॉगिन', emailLbl: 'ईमेल', passLbl: 'पासवर्ड',
+      loginSub: 'AquaPure डिलीवरी टीम', denied: 'अनुमति नहीं!',
+      invalid: 'गलत जानकारी! फिर कोशिश करें।',
+      langSwitch: 'English'
+    }
+  };
+
+  function t(key) { return T[lang][key] || T.en[key]; }
+
+  function applyLang() {
+    document.getElementById('topbar-title').textContent  = t('title');
+    document.getElementById('btn-logout').textContent    = t('logout');
+    document.getElementById('lbl-pending').textContent   = t('pending');
+    document.getElementById('lbl-done').textContent      = t('done');
+    document.getElementById('lbl-total').textContent     = t('total');
+    document.getElementById('btn-login-text').textContent= t('loginBtn');
+    document.getElementById('lbl-email').textContent     = t('emailLbl');
+    document.getElementById('lbl-pass').textContent      = t('passLbl');
+    document.getElementById('loginSubtitle').textContent = t('loginSub');
+    document.getElementById('langToggleBtn').textContent = t('langSwitch');
+    // Re-render orders with new language
+    if (window._lastOrders) renderOrders(window._lastOrders);
+  }
+
+  window.toggleLang = function() {
+    lang = lang === 'en' ? 'hi' : 'en';
+    localStorage.setItem('delivLang', lang);
+    applyLang();
+  };
+
+  // ── Set today's date in topbar ──
+  function setDate() {
+    const now = new Date();
+    const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+    document.getElementById('topbar-date').textContent = now.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', opts);
+  }
+
+  // ── Auth state ──
+  onAuthStateChanged(auth, user => {
+    if (user && ALLOWED.includes(user.email)) {
+      document.getElementById('loginPage').style.display  = 'none';
+      document.getElementById('dashboard').style.display  = 'block';
+      applyLang();
+      setDate();
+      startRealtimeOrders();
+    } else if (user) {
+      signOut(auth);
+    } else {
+      document.getElementById('loginPage').style.display  = 'flex';
+      document.getElementById('dashboard').style.display  = 'none';
+    }
+  });
+
+  // ── Login ──
+  window.deliveryLogin = async function() {
+    const email = document.getElementById('delEmail').value.trim();
+    const pw    = document.getElementById('delPassword').value;
+    if (!ALLOWED.includes(email)) { showAlert(t('denied')); return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, pw);
+    } catch(e) {
+      showAlert(t('invalid'));
+    }
+  };
+
+  // ── Logout ──
+  window.deliveryLogout = async function() {
+    await signOut(auth);
+  };
+
+  function showAlert(msg) {
+    let el = document.getElementById('loginAlert');
+    el.className = 'alert-error';
+    el.textContent = msg;
+  }
+
+  // ── Real-time listeners for both orders and customers ──
+  let _customers = [];
+
+  function startRealtimeOrders() {
+    // Listen to customers first (for name & phone lookup)
+    onSnapshot(collection(db, 'customers'), snap => {
+      _customers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (window._lastOrders) renderOrders(window._lastOrders);
+    });
+
+    // Listen to orders — newest first
+    onSnapshot(
+      query(collection(db, 'orders'), orderBy('createdAt', 'desc')),
+      snap => {
+        const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        window._lastOrders = orders;
+        renderOrders(orders);
+      }
+    );
+  }
+
+  function getCustInfo(uid, fallbackEmail) {
+    const c = _customers.find(c => c.uid === uid) || {};
+    return {
+      name:  c.name  || fallbackEmail || 'Customer',
+      phone: c.phone || null
+    };
+  }
+
+  function renderOrders(orders) {
+    const total   = orders.length;
+    let pending   = 0, done = 0;
+
+    document.getElementById('totalCount').textContent   = total;
+
+    if (total === 0) {
+      document.getElementById('pendingCount').textContent = 0;
+      document.getElementById('doneCount').textContent    = 0;
+      document.getElementById('ordersList').innerHTML = `
+        <div class="empty">
+          <i class="ti ti-circle-check" style="color:#3b6d11;"></i>
+          <h3>${t('noOrders')}</h3>
+          <p>${t('noOrdersSub')}</p>
+        </div>`;
+      return;
+    }
+
+    // Count stats
+    orders.forEach(o => { o.status === 'delivered' ? done++ : pending++; });
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('doneCount').textContent    = done;
+
+    // ── Group by date ──
+    const groups = {}; // key: date string, value: { label, sortKey, pendingOrders[], doneOrders[] }
+    orders.forEach(o => {
+      const ts = o.createdAt?.toDate ? o.createdAt.toDate() : null;
+      const dateKey = ts
+        ? ts.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+        : (lang === 'hi' ? 'अज्ञात तारीख' : 'Unknown Date');
+      const sortKey = o.createdAt?.seconds || 0;
+
+      if (!groups[dateKey]) groups[dateKey] = { label: dateKey, sortKey, pendingOrders: [], doneOrders: [] };
+      // Use max sortKey for group sorting
+      if (sortKey > groups[dateKey].sortKey) groups[dateKey].sortKey = sortKey;
+
+      if (o.status === 'delivered') groups[dateKey].doneOrders.push(o);
+      else                          groups[dateKey].pendingOrders.push(o);
+    });
+
+    // Sort groups newest first
+    const sortedGroups = Object.values(groups).sort((a, b) => b.sortKey - a.sortKey);
+
+    let html = '';
+    sortedGroups.forEach(g => {
+      const totalInGroup = g.pendingOrders.length + g.doneOrders.length;
+      const pendingInGroup = g.pendingOrders.length;
+      const doneInGroup = g.doneOrders.length;
+
+      html += `
+        <div style="margin-bottom:20px;">
+          <!-- Date header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;
+                      background:#fff;border-radius:10px;padding:10px 14px;margin-bottom:10px;
+                      border-left:4px solid #1a6fc4;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <i class="ti ti-calendar" style="color:#1a6fc4;font-size:16px;"></i>
+              <span style="font-size:14px;font-weight:700;color:#1a1a2e;">${g.label}</span>
+            </div>
+            <div style="display:flex;gap:8px;font-size:12px;">
+              <span style="background:#fff8e1;color:#ba7517;padding:3px 10px;border-radius:20px;font-weight:600;">⏳ ${pendingInGroup}</span>
+              <span style="background:#eaf3de;color:#3b6d11;padding:3px 10px;border-radius:20px;font-weight:600;">✅ ${doneInGroup}</span>
+              <span style="background:#e6f1fb;color:#0c447c;padding:3px 10px;border-radius:20px;font-weight:600;">${totalInGroup} ${lang==='hi'?'कुल':'total'}</span>
+            </div>
+          </div>
+
+          ${g.pendingOrders.length > 0 ? `
+            <div class="sec-title pending-title">
+              <i class="ti ti-clock"></i> ${t('pendingTitle')} (${pendingInGroup})
+            </div>
+            ${g.pendingOrders.map(o => renderCard(o, false)).join('')}
+          ` : ''}
+
+          ${g.doneOrders.length > 0 ? `
+            <div class="sec-title done-title" style="margin-top:${g.pendingOrders.length>0?'12px':'0'};">
+              <i class="ti ti-check"></i> ${t('doneTitle')} (${doneInGroup})
+            </div>
+            ${g.doneOrders.map(o => renderCard(o, true)).join('')}
+          ` : ''}
+        </div>`;
+    });
+
+    document.getElementById('ordersList').innerHTML = html;
+    setDate();
+  }
+
+  function renderCard(o, isDone) {
+    const bottles  = Number(o.bottles) || 1;
+    const info     = getCustInfo(o.uid, o.email);
+    const address  = o.address || '—';
+    // Check all possible time field names saved from order form
+    const time = o.time || o.timeSlot || o.newOrderTime || o.deliveryTime || '—';
+    const plan     = o.plan    || '—';
+    const bill     = Number(o.bill) || bottles * 20;
+    const badgeCls = isDone ? 'badge-delivered' : o.status === 'transit' ? 'badge-transit' : 'badge-pending';
+    const badgeTxt = isDone ? t('done') : o.status === 'transit' ? t('inTransit') : t('pending');
+
+    return `<div class="order-card ${isDone ? 'delivered' : ''}" id="card-${o.id}">
+      <div class="order-top">
+        <div style="flex:1;">
+          <div class="order-name">👤 ${info.name}</div>
+          ${info.phone ? `<div class="order-detail">
+            <i class="ti ti-phone" style="font-size:12px;color:#1a6fc4;"></i>
+            <a href="tel:${info.phone}" style="color:#1a6fc4;font-weight:600;text-decoration:none;">${info.phone}</a>
+          </div>` : ''}
+          <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span class="order-bottles"><i class="ti ti-droplet" style="font-size:11px;"></i> ${bottles} ${t('bottles')}</span>
+            <span style="font-size:12px;color:#888;">${plan}</span>
+            <span style="font-size:12px;font-weight:700;color:#1a6fc4;">₹${bill}</span>
+          </div>
+          <div class="order-detail"><i class="ti ti-map-pin" style="font-size:12px;color:#1a6fc4;"></i> ${address}</div>
+          <div style="margin-top:8px;background:#e6f1fb;border-radius:8px;padding:7px 12px;display:inline-flex;align-items:center;gap:6px;">
+            <i class="ti ti-clock" style="font-size:13px;color:#0c447c;"></i>
+            <span style="font-size:13px;font-weight:700;color:#0c447c;">${time === '—' ? (lang==='hi' ? 'समय नहीं चुना' : 'No time selected') : time}</span>
+          </div>
+          ${o.notes ? `<div class="order-detail"><i class="ti ti-note" style="font-size:12px;color:#888;"></i> ${o.notes}</div>` : ''}
+        </div>
+        <span class="badge ${badgeCls}">${badgeTxt}</span>
+      </div>
+
+      ${isDone
+        ? `<!-- Already delivered -->
+           <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 14px;
+                       background:#eaf3de;border-radius:10px;border:1px solid #c3e6a0;">
+             <i class="ti ti-circle-check" style="color:#3b6d11;font-size:20px;"></i>
+             <span style="font-size:13px;font-weight:600;color:#3b6d11;">${lang==='hi' ? 'डिलीवरी हो गई ✅' : 'Delivery Completed ✅'}</span>
+           </div>`
+
+        : o.status === 'transit'
+          ? `<!-- In Transit — show big Delivered button -->
+             <div style="margin-top:10px;">
+               <div style="background:#e6f1fb;border-radius:8px;padding:7px 12px;margin-bottom:8px;font-size:12px;color:#0c447c;font-weight:600;">
+                 🚛 ${lang==='hi' ? 'रास्ते में है — पहुंचने पर Delivered दबाएं' : 'In Transit — Press Delivered on arrival'}
+               </div>
+               <button onclick="window.confirmDeliver('${o.id}','${info.name}')"
+                 style="width:100%;padding:14px;background:#3b6d11;color:#fff;border:none;border-radius:12px;
+                        font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;
+                        justify-content:center;gap:10px;box-shadow:0 3px 8px rgba(59,109,17,0.3);">
+                 <i class="ti ti-circle-check" style="font-size:20px;"></i>
+                 ${lang==='hi' ? 'डिलीवर हो गया ✅' : 'Mark as Delivered ✅'}
+               </button>
+             </div>`
+
+          : `<!-- Pending — show both buttons -->
+             <div class="action-btns" style="margin-top:10px;">
+               <button class="action-btn btn-transit" onclick="window.mark('${o.id}','transit')">
+                 ${t('markTransit')}
+               </button>
+               <button class="action-btn btn-delivered"
+                 style="background:#3b6d11;color:#fff;font-size:14px;font-weight:700;box-shadow:0 2px 6px rgba(59,109,17,0.25);"
+                 onclick="window.confirmDeliver('${o.id}','${info.name}')">
+                 ${t('markDone')}
+               </button>
+             </div>`
+      }
+    </div>`;
+  }
+
+  window.mark = async function(id, status) {
+    try { await updateDoc(doc(db,'orders',id), { status }); }
+    catch(e) { alert('Error! Try again.'); }
+  };
+
+  // ── Confirm & deliver with toast ──
+  window.confirmDeliver = async function(id, name) {
+    const msg = lang === 'hi'
+      ? `क्या आप "${name}" की डिलीवरी Delivered mark करना चाहते हैं?`
+      : `Mark delivery for "${name}" as Delivered?`;
+    if (!confirm(msg)) return;
+
+    // Disable button instantly
+    const card = document.getElementById('card-' + id);
+    if (card) {
+      const btns = card.querySelectorAll('button');
+      btns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+    }
+
+    try {
+      await updateDoc(doc(db,'orders',id), { status: 'delivered' });
+      showToast(lang === 'hi' ? `✅ ${name} — डिलीवरी हो गई!` : `✅ ${name} — Delivered!`);
+    } catch(e) {
+      alert('Error! Try again.');
+      if (card) {
+        const btns = card.querySelectorAll('button');
+        btns.forEach(b => { b.disabled = false; b.style.opacity = '1'; });
+      }
+    }
+  };
+
+  // ── Toast notification ──
+  function showToast(msg) {
+    let toast = document.getElementById('deliveryToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'deliveryToast';
+      toast.style.cssText = `
+        position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+        background:#3b6d11;color:#fff;padding:13px 24px;border-radius:50px;
+        font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.2);
+        transition:transform 0.3s ease;white-space:nowrap;`;
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
+    setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(80px)'; }, 3000);
+  }
+
+  // Enter key on login
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.deliveryLogin();
+  });
+</script>
+</body>
+</html>
